@@ -29,7 +29,6 @@ class prodotti
         add_action('admin_init', array($this, 'sezione_valori_menu'));
         $this->options = get_option('prodotti_test', $this->defaults);
         add_shortcode( 'dpc_prodotti', array($this, 'dpc') ); 
-        wp_enqueue_style('prodotti-style', plugins_url('style.css', __FILE__));
     }
     
     public function prodotti_menu()
@@ -42,6 +41,8 @@ class prodotti
     if ( !current_user_can( 'manage_options' ) )  {
         wp_die( __( 'Non hai i permessi per entrare qui!' ) );
     }
+    
+    wp_enqueue_style('prodotti-style', plugins_url('style.css', __FILE__));
     echo '<div class="wrap">';
     
     if(WP_DEBUG == true)
@@ -140,6 +141,7 @@ class prodotti
     /* Dynamic Page Content */
     public function dpc ()
     {
+        wp_enqueue_style('prodotti-style', plugins_url('style.css', __FILE__));
         ob_start();
         
         if(isset( $_GET['prodotto'] )) 
