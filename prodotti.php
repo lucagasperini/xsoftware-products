@@ -118,14 +118,14 @@ class prodotti
             
             
             echo "<tr>
-<td><input type='text' name='prodotti_test[new][ID]' placeholder='ID..'></td>
-<td><input type='text' name='prodotti_test[new][nome]' placeholder='Nome..'></td>
-<td><input type='text' name='prodotti_test[new][img]' placeholder='Immagine..'></td>
-<td><input type='text' name='prodotti_test[new][titolo]' placeholder='Titolo..'></td>
-<td><input type='text' name='prodotti_test[new][desc]' placeholder='Descrizione..'></td>
-<td><textarea name='prodotti_test[new][testo]' placeholder='Testo..'></textarea></td>
-</tr>
-</table>";
+            <td><input type='text' name='prodotti_test[new][ID]' placeholder='ID..'></td>
+            <td><input type='text' name='prodotti_test[new][nome]' placeholder='Nome..'></td>
+            <td><input type='text' name='prodotti_test[new][img]' placeholder='Immagine..'></td>
+            <td><input type='text' name='prodotti_test[new][titolo]' placeholder='Titolo..'></td>
+            <td><textarea name='prodotti_test[new][desc]' placeholder='Descrizione..'></textarea></td>
+            <td><textarea name='prodotti_test[new][testo]' placeholder='Testo..'></textarea></td>
+            </tr>
+            </table>";
             
     }
    
