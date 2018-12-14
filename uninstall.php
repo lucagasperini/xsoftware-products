@@ -5,4 +5,5 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
 }
  
 delete_option('prodotti_test');
+delete_option('prodotti_field');
 ?>
