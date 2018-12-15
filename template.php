@@ -2,10 +2,10 @@
 
 function products_main($products)
 {
-    echo '<div class="product_list">';
-    for($i = 0; $i < count($products); $i++)
-        echo '<div class="product_list_item"><a href="?product='.$products[$i]['ID'].'"><img src="'.$products[$i]['img'].'" /><span>'.$products[$i]['name'].'</span></a></div>';
-    echo '</div>';
+        echo '<div class="product_list">';
+        for($i = 0; $i < count($products); $i++)
+                echo '<div class="product_list_item"><a href="?product='.$products[$i]['ID'].'"><img src="'.$products[$i]['img'].'" /><span>'.$products[$i]['name'].'</span></a></div>';
+        echo '</div>';
 }
 
 function products_single($product)
