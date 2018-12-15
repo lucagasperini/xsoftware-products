@@ -197,41 +197,29 @@ class prodotti
             
     }
    
-    function load_table()
-    {
-    echo '<div class="product_list">';
-    for($i = 0; $i < count($this->options); $i++)
-        echo '<div class="product_list_item"><a href="?product='.$this->options[$i]['ID'].'"><img src="'.$this->options[$i]['img'].'" /><span>'.$this->options[$i]['name'].'</span></a></div>';
-    echo '</div>';
-    
-    }
     /* Dynamic Page Content */
     function dpc ()
     {
-        wp_enqueue_style('prodotti-style', plugins_url('style.css', __FILE__));
+        include 'template.php';
+        wp_enqueue_style('product-style', plugins_url('style.css', __FILE__));
         ob_start();
         
-        if(isset( $_GET['product'] )) 
-            $this->print_page($_GET['product']);
-        else
-            $this->load_table();
-            
-        return ob_get_clean();
-    }
-    
-    function print_page($id)
-    {
-        for($i = 0; $i < count($this->options); $i++)
-            if($this->options[$i]['ID'] == $id)
-                $product = $this->options[$i];
-        
-        if(!isset($product)) 
+        if(!isset( $_GET['product'] )) 
         {
-            $this->load_table();
-            return;
+                products_main($this->options);
+                return;
         }
-        include 'template.php';
         
+        for($i = 0; $i < count($this->options); $i++)
+                if($this->options[$i]['ID'] == $_GET['product'])
+                         $product = $this->options[$i];
+                         
+        if(!isset($product)) 
+                products_main($this->options);
+        else
+                products_single($product);
+
+        return ob_get_clean();
     }
 
 }
