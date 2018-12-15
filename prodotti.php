@@ -201,7 +201,7 @@ class prodotti
     function dpc ()
     {
         include 'template.php';
-        wp_enqueue_style('product-style', plugins_url('style.css', __FILE__));
+        wp_enqueue_style('products_style', plugins_url('style.css', __FILE__));
         ob_start();
         
         if(!isset( $_GET['product'] )) 
