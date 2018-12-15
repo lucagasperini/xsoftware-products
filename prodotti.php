@@ -147,7 +147,7 @@ class prodotti
                 <th>Name Fields</th>
                 </tr>
         <?php
-                size = count($this->fields);
+                $size = count($this->fields);
                 for($i = 0; $i < $size; $i++) {
                 echo "<tr>
                 <td><input readonly type='text' name='product_field[".$i."][ID]' value='".$this->fields[$i]['ID']."'></td>
