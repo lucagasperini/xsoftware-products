@@ -37,6 +37,12 @@ class prodotti
                                      )
                              );
 
+        private $def_global = array ( 
+                                        'template_file' => 'template.php'
+        );
+        
+        private $globals = array( );
+        
         private $fields = array( array ( ) );
 
         private $options = array( array ( ) );
@@ -45,6 +51,7 @@ class prodotti
         {
                 add_action('admin_menu', array($this, 'admin_menu'));
                 add_action('admin_init', array($this, 'section_menu'));
+                $this->globals = get_option('product_global', $this->def_global);
                 $this->fields = get_option('product_field', $this->def_field);
                 $this->options = get_option('product_value', $this->def_product);
                 add_shortcode( 'xsoftware_dpc_products', array($this, 'dpc') );
@@ -61,7 +68,7 @@ class prodotti
                         wp_die( __( 'Exit!' ) );
                 }
 
-                wp_enqueue_style('products_style', plugins_url('style.css', __FILE__));
+                wp_enqueue_style('products_style', plugins_url('style/admin.css', __FILE__));
                 echo '<div class="wrap">';
 
                 if(WP_DEBUG == true) {
@@ -70,38 +77,49 @@ class prodotti
                 }
 
                 echo '<h2>Products configuration</h2>';
+                
+                // <GLOBAL>
+                echo '<form action="options.php" method="post">';
 
+                settings_fields('setting_globals');
+                do_settings_sections('globals');
+
+                submit_button( '', 'primary', 'field_update', true, NULL );
+                echo '</form>';
+                // </GLOBAL>
+                
+                // <FIELDS>
                 echo '<form action="options.php" method="post">';
 
                 settings_fields('setting_field');
                 do_settings_sections('fields');
 
-                /* https://codex.wordpress.org/Function_Reference/submit_button */
                 submit_button( 'Update fields', 'primary', 'field_update', true, NULL );
                 echo '</form>';
-
-
+                // </FIELDS>
+                
+                // <PRODUCTS>
                 echo '<form action="options.php" method="post">';
 
                 settings_fields('setting_product');
                 do_settings_sections('products');
 
-                /* https://codex.wordpress.org/Function_Reference/submit_button */
                 submit_button( 'Update products', 'primary', 'product_update', true, NULL );
                 echo '</form>';
+                // </PRODUCTS>
+                
                 echo '</div>';
         }
 
         function section_menu()
         {
-                /* https://developer.wordpress.org/reference/functions/register_setting/ */
+                register_setting( 'setting_globals', 'product_global', array($this, 'input_global') );
+                add_settings_section( 'section_globals', 'Global settings', array($this, 'show_globals'), 'globals' );
+                
                 register_setting( 'setting_field', 'product_field', array($this, 'input_field') );
-                /* https://codex.wordpress.org/Function_Reference/add_settings_section */
                 add_settings_section( 'section_field', 'List of fields', array($this, 'show_fields'), 'fields' );
 
-                /* https://developer.wordpress.org/reference/functions/register_setting/ */
                 register_setting( 'setting_product', 'product_value', array($this, 'input_products') );
-                /* https://codex.wordpress.org/Function_Reference/add_settings_section */
                 add_settings_section( 'section_products', 'List of products', array($this, 'show_products'), 'products' );
         }
 
@@ -113,6 +131,12 @@ class prodotti
                                 return true;
                 
                 return false;
+        }
+        
+        function input_global($input)
+        {
+                $input['template_file'] = sanitize_text_field( $input['template_file'] );
+                return $input;
         }
         
         function input_field($input)
@@ -148,6 +172,12 @@ class prodotti
                 unset($input['new']);
                 return $input;
         }
+        
+        function show_globals()
+        {
+                echo "Template file path: <input type='text' name='product_global[template_file]' value='".$this->globals["template_file"]."'>";
+        }
+        
         function show_fields()
         {
         ?>
@@ -173,6 +203,7 @@ class prodotti
                 </table>";
 
         }
+        
         function show_products()
         {
                 echo "<table class='product_admin_tbl'><tr>";
@@ -203,8 +234,7 @@ class prodotti
         /* Dynamic Page Content */
         function dpc ()
         {
-                include 'template.php';
-                wp_enqueue_style('products_style', plugins_url('style.css', __FILE__));
+                include $this->globals["template_file"];
                 ob_start();
 
                 if(!isset( $_GET['product'] )) {
