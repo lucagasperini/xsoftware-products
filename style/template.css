@@ -1,17 +1,19 @@
 .product_list{
     display:table;
     width: 100%;
-    }
+}
     
 .product_list_item:hover{
         box-shadow: 0 1px 2px rgba(0,0,0,.3);
-    }
+}
+
 .product_list_item:hover > a > img {
         display: block;
         transform: scale(1.1, 1.1);
         -ms-transform: scale(1.1, 1.1);
         -webkit-transform: scale(1.1, 1.1);
-    }
+}
+
 .product_list_item {
     position: relative;
     display: block;
@@ -20,7 +22,8 @@
     height:350px;
     float:left;
     text-decoration:none;
-    }
+}
+
 .product_list_item > a > span {
     position: absolute;
     bottom: 0px;
@@ -36,7 +39,7 @@
     margin-right: auto;
     width:70px;
     height:300px;
-    }
+}
 
 .product_img {
     width:15%; 
@@ -51,7 +54,7 @@
 .product_nome {
     color:#ffb342;
     font-size:25px;
-.}
+}
 
 .product_desc {
     text-align: center;
