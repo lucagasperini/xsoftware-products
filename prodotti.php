@@ -105,6 +105,16 @@ class prodotti
                 add_settings_section( 'section_products', 'List of products', array($this, 'show_products'), 'products' );
         }
 
+        function check_duplicate_id($key, $array)
+        {
+                $size = count($array);
+                for($i = 0; $i < $size; $i++)
+                        if($array[$i]['ID'] == $key)
+                                return true;
+                
+                return false;
+        }
+        
         function input_field($input)
         {
                 $size_fields = count($this->fields);
@@ -112,7 +122,7 @@ class prodotti
                         $input[$i]['ID'] = sanitize_text_field($input[$i]['ID']);
                         $input[$i]['name'] = sanitize_text_field($input[$i]['name']);
                 }
-                if(!empty($input['new']['ID']) && !empty($input['new']['name'])) {
+                if(!empty($input['new']['ID']) && !empty($input['new']['name']) && !check_duplicate_id($input['new']['ID'], $this->fields)) {
                         $input[$size_fields]['ID'] = sanitize_text_field($input['new']['ID']);
                         $input[$size_fields]['name'] = sanitize_text_field($input['new']['name']);
                 }
@@ -129,7 +139,7 @@ class prodotti
                                 $input[$i][$field] = sanitize_text_field($input[$i][$field]);
                         }
                 }
-                if(!empty($input['new']['ID'])) {
+                if(!empty($input['new']['ID']) && !$this->check_duplicate_id($input['new']['ID'], $this->options)) {
                         for($i = 0; $i < count($this->fields); $i++) {
                                 $field = $this->fields[$i]['ID'];
                                 $input[$size_products][$field] = sanitize_text_field($input['new'][$field]);
