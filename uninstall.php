@@ -4,6 +4,6 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
     die;
 }
  
-delete_option('prodotti_test');
-delete_option('prodotti_field');
+delete_option('product_value');
+delete_option('product_field');
 ?>

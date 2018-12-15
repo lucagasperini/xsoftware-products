@@ -11,39 +11,29 @@ if(!defined('ABSPATH')) exit;
 
 class prodotti
 {
-    private $defaults = array ( array (
-        'ID'    =>   0,
-        'nome'  =>   '' ,
-        'img'   =>   '' ,
-        'titolo'=>   '' ,
-        'desc'  =>   '' ,
-        'testo' =>  ''
+    private $def_product = array ( array (
+        'ID'    =>   'awesome_product',
+        'name'  =>   'An Awesome Product' ,
+        'img'   =>   'https://i.kym-cdn.com/entries/icons/mobile/000/000/107/smily.jpg' ,
+        'desc'  =>   'This is an  very awesome product!'
         )
     );
     private $def_field = array ( 
         array (
         'ID' => 'ID',
-        'nome' => 'ID'
+        'name' => 'ID'
         ),
         array (
-        'ID' => 'nome',
-        'nome' => 'Nome'
+        'ID' => 'name',
+        'name' => 'Name'
         ),
         array (
         'ID' => 'img',
-        'nome' => 'Immagine'
-        ),
-        array (
-        'ID' => 'titolo',
-        'nome' => 'Titolo'
+        'name' => 'Image'
         ),
         array (
         'ID' => 'desc',
-        'nome' => 'Descrizione'
-        ),
-        array (
-        'ID' => 'testo',
-        'nome' => 'Testo'
+        'name' => 'Description'
         )
     );
     
@@ -53,25 +43,24 @@ class prodotti
     
     public function __construct()
     {
-        add_action('admin_menu', array($this, 'prodotti_menu'));
-        add_action('admin_init', array($this, 'sezione_valori_menu'));
-        $this->fields = get_option('prodotti_field', $this->def_field);
-        $this->options = get_option('prodotti_test', $this->defaults);
-        add_shortcode( 'dpc_prodotti', array($this, 'dpc') ); 
+        add_action('admin_menu', array($this, 'admin_menu'));
+        add_action('admin_init', array($this, 'section_menu'));
+        $this->fields = get_option('product_field', $this->def_field);
+        $this->options = get_option('product_value', $this->def_product);
+        add_shortcode( 'xsoftware_dpc_products', array($this, 'dpc') ); 
     }
     
-    function prodotti_menu()
+    function admin_menu()
     {
-    // NOME DELLA PAGINA, NOME DEL MENU, PRIVILEGI NECESSARI, URL DEL MODULO PLUGIN, FUNZIONE DA CHIAMARE DENTRO LA CLASSE QUANDO VIENE ATTIVATO IL MENU
-    add_menu_page( 'XSoftware Prodotti', 'XSoftware Prodotti', 'manage_options', 'prodotti', array($this, 'pro_main') );
+    add_menu_page( 'XSoftware Products', 'XSoftware Products', 'manage_options', 'xsoftware_products', array($this, 'menu_page') );
     }
     
-    public function pro_main() {
+    public function menu_page() {
     if ( !current_user_can( 'manage_options' ) )  {
-        wp_die( __( 'Non hai i permessi per entrare qui!' ) );
+        wp_die( __( 'Exit!' ) );
     }
     
-    wp_enqueue_style('prodotti-style', plugins_url('style.css', __FILE__));
+    wp_enqueue_style('products_style', plugins_url('style.css', __FILE__));
     echo '<div class="wrap">';
     
     if(WP_DEBUG == true) {
@@ -79,114 +68,122 @@ class prodotti
         var_dump($this->fields);
     }
         
-    echo '<h2>Configurazione dei prodotti</h2>';
+    echo '<h2>Products configuration</h2>';
     
     echo '<form action="options.php" method="post">';
     
-    settings_fields('field-add');
+    settings_fields('setting_field');
     do_settings_sections('fields');
     
     /* https://codex.wordpress.org/Function_Reference/submit_button */
-    submit_button( 'Aggiungi i campi', 'primary', 'field_update', true, NULL );
+    submit_button( 'Update fields', 'primary', 'field_update', true, NULL );
     echo '</form>';
     
     
     echo '<form action="options.php" method="post">';
     
-    settings_fields('campo-prodotti');
-    do_settings_sections('prodotti');
+    settings_fields('setting_product');
+    do_settings_sections('products');
     
     /* https://codex.wordpress.org/Function_Reference/submit_button */
-    submit_button( 'Salva le modifiche', 'primary', 'prodotti_salva', true, NULL );
+    submit_button( 'Update products', 'primary', 'product_update', true, NULL );
     echo '</form>';
     echo '</div>';
 }
 
-    function sezione_valori_menu()
+    function section_menu()
     {
             /* https://developer.wordpress.org/reference/functions/register_setting/ */
-        register_setting( 'field-add', 'prodotti_field', array($this, 'input_field') );
+        register_setting( 'setting_field', 'product_field', array($this, 'input_field') );
         /* https://codex.wordpress.org/Function_Reference/add_settings_section */
-        add_settings_section( 'sezione_field', 'Lista dei campi', array($this, 'mostra_campi'), 'fields' );
+        add_settings_section( 'section_field', 'List of fields', array($this, 'show_fields'), 'fields' );
         
         /* https://developer.wordpress.org/reference/functions/register_setting/ */
-        register_setting( 'campo-prodotti', 'prodotti_test', array($this, 'input_prodotti') );
+        register_setting( 'setting_product', 'product_value', array($this, 'input_products') );
         /* https://codex.wordpress.org/Function_Reference/add_settings_section */
-        add_settings_section( 'sezione_principale', 'Lista dei prodotti', array($this, 'mostra_sezione'), 'prodotti' );
+        add_settings_section( 'section_products', 'List of products', array($this, 'show_products'), 'products' );
     }
     
     function input_field($input)
     {
-     $size = count($this->fields) - 1;
-        for($i = 0; $i < $size; $i++)
+     $size_fields = count($this->fields);
+        for($i = 0; $i < $size_fields; $i++)
         {
             $input[$i]['ID'] = sanitize_text_field($input[$i]['ID']);
-            $input[$i]['nome'] = sanitize_text_field($input[$i]['nome']);
+            $input[$i]['name'] = sanitize_text_field($input[$i]['name']);
         }
-        if(!empty($input['new']['ID']) && !empty($input['new']['nome']))
+        if(!empty($input['new']['ID']) && !empty($input['new']['name']))
         {
-            $input[$size]['ID'] = sanitize_text_field($input['new']['ID']);
-            $input[$size]['nome'] = sanitize_text_field($input['new']['nome']);
+            $input[$size_fields]['ID'] = sanitize_text_field($input['new']['ID']);
+            $input[$size_fields]['name'] = sanitize_text_field($input['new']['name']);
         }
+        unset($input['new']);
         return $input;
     }
     
-    function input_prodotti($input)
+    function input_products($input)
     {
-     $size = count($this->options) - 1;
-        for($i = 0; $i < $size; $i++)
+     $size_products = count($this->options);
+        for($i = 0; $i < $size_products; $i++)
         {
-            for($k = 0; $k < $size_field; $k++)
-                $input[$i][$this->fields[$k]['ID']] = sanitize_text_field($input[$i][$this->fields[$k]['ID']]);
+                for($k = 0; $k < count($this->fields); $k++)
+                {
+                $field = $this->fields[$k]['ID'];
+                $input[$i][$field] = sanitize_text_field($input[$i][$field]);
+                }
         }
         if(!empty($input['new']['ID']))
         {
-            for($k = 0; $k < $size_field; $k++)
-                $input[$size][$this->fields[$k]['ID']] = sanitize_text_field($input[$size][$this->fields[$k]['ID']]);
+                for($i = 0; $i < count($this->fields); $i++)
+                {
+                $field = $this->fields[$i]['ID'];
+                $input[$size_products][$field] = sanitize_text_field($input['new'][$field]);
+                }
         }
+        unset($input['new']);
         return $input;
     }
-    function mostra_campi()
+    function show_fields()
     {
         ?>
-        <table class='xs-table'>
+        <table class='product_admin_tbl'>
         <tr>
-            <th>ID Campi</th>
-            <th>Nome Campi</th>
+            <th>ID Fields</th>
+            <th>Name Fields</th>
         </tr>
         <?php
-        $size = count($this->fields) - 1;
+        $size = count($this->fields);
         for($i = 0; $i < $size; $i++)
             {
             echo "<tr>
-            <td><input type='text' name='prodotti_field[".$i."][ID]' value='".$this->fields[$i]['ID']."'></td>
-            <td><input type='text' name='prodotti_field[".$i."][nome]' value='".$this->fields[$i]['nome']."'></td>
+            <td><input readonly type='text' name='product_field[".$i."][ID]' value='".$this->fields[$i]['ID']."'></td>
+            <td><input type='text' name='product_field[".$i."][name]' value='".$this->fields[$i]['name']."'></td>
             </tr>";
             }
             
             
             echo "<tr>
-            <td><input type='text' name='prodotti_field[new][ID]' placeholder='ID campo..'></td>
-            <td><input type='text' name='prodotti_field[new][nome]' placeholder='Nome campo..'></td>
+            <td><input type='text' name='product_field[new][ID]' placeholder='Add ID..'></td>
+            <td><input type='text' name='product_field[new][name]' placeholder='Add Name..'></td>
             </tr>
             </table>";
             
     }
-    function mostra_sezione()
+    function show_products()
     {
-        echo "<table class='xs-table'><tr>";
+        echo "<table class='product_admin_tbl'><tr>";
         
-        $size_field = count($this->fields) - 1;
+        $size_field = count($this->fields);
         for($i = 0; $i < $size_field; $i++)
-            echo "<th>".$this->fields[$i]['nome']."</th>";
+            echo "<th>".$this->fields[$i]['name']."</th>";
         echo "</tr>";
         
-        $size_prodotti = count($this->options) - 1;
-        for($i = 0; $i < $size_prodotti; $i++)
+        $size_products = count($this->options);
+        for($i = 0; $i < $size_products; $i++)
         {
             echo "<tr>";
             for($k = 0; $k < $size_field; $k++)
-                echo "<td><textarea name='prodotti_test[".$i."][".$this->fields[$k]['ID']."]'>".$this->options[$i][$this->fields[$k]['ID']]."</textarea></td>";
+                echo "<td><textarea name='product_value[".$i."][".$this->fields[$k]['ID']."]'>".$this->options[$i][$this->fields[$k]['ID']]."</textarea></td>";
             echo "</tr>";
         }
             
@@ -194,7 +191,7 @@ class prodotti
         echo "<tr>";
             
         for($i = 0; $i < $size_field; $i++)
-            echo "<td><textarea name='prodotti_test[new][".$this->fields[$i]['ID']."]' placeholder='".$this->fields[$i]['nome']."..'></textarea></td>";
+            echo "<td><textarea name='product_value[new][".$this->fields[$i]['ID']."]' placeholder='Add ".$this->fields[$i]['name']."..'></textarea></td>";
             
         echo "</tr></table>";
             
@@ -202,9 +199,9 @@ class prodotti
    
     function load_table()
     {
-    echo '<div class="tbl-prodotti">';
-    for($i = 0; $i < count($this->options) - 1; $i++)
-        echo '<div class="prodotti"><a href="?prodotto='.$this->options[$i]['ID'].'"><img src="'.$this->options[$i]['img'].'" /><span>'.$this->options[$i]['nome'].'</span></a></div>';
+    echo '<div class="product_list">';
+    for($i = 0; $i < count($this->options); $i++)
+        echo '<div class="product_list_item"><a href="?product='.$this->options[$i]['ID'].'"><img src="'.$this->options[$i]['img'].'" /><span>'.$this->options[$i]['name'].'</span></a></div>';
     echo '</div>';
     
     }
@@ -214,8 +211,8 @@ class prodotti
         wp_enqueue_style('prodotti-style', plugins_url('style.css', __FILE__));
         ob_start();
         
-        if(isset( $_GET['prodotto'] )) 
-            $this->print_page($_GET['prodotto']);
+        if(isset( $_GET['product'] )) 
+            $this->print_page($_GET['product']);
         else
             $this->load_table();
             
@@ -224,11 +221,11 @@ class prodotti
     
     function print_page($id)
     {
-        for($i = 0; $i < count($this->options) - 1; $i++)
+        for($i = 0; $i < count($this->options); $i++)
             if($this->options[$i]['ID'] == $id)
-                $prodotto = $this->options[$i];
+                $product = $this->options[$i];
         
-        if(!isset($prodotto)) 
+        if(!isset($product)) 
         {
             $this->load_table();
             return;
@@ -239,6 +236,6 @@ class prodotti
 
 }
 
-$prodotti = new prodotti();
+$plugin_product = new prodotti();
 
 ?>
