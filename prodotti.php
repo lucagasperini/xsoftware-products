@@ -9,7 +9,7 @@ Text Domain: xsoftware_products
 */
 if(!defined('ABSPATH')) exit;
 
-class prodotti
+class xsproducts
 {
         private $def_product = array ( array (
                                                'ID'    =>   'awesome_product',
@@ -256,6 +256,6 @@ class prodotti
 
 }
 
-$plugin_product = new prodotti();
+$plugin_product = new xsproducts();
 
 ?>
