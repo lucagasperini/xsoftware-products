@@ -9,6 +9,10 @@ td {
     padding: 8px;
 }
 
+td > * {
+        width: 100%;
+}
+
 th {
     border: 1px solid #dddddd;
     text-align: left;

@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: XSoftware Prodotti
-Description: Gestione dei prodotti su wordpress
+Plugin Name: XSoftware Products
+Description: Products management on wordpress.
 Version: 1.0
 Author: Luca Gasperini
 Author URI: https://xsoftware.eu/
-Text Domain: prodotti
+Text Domain: xsoftware_products
 */
 if(!defined('ABSPATH')) exit;
 
@@ -146,7 +146,7 @@ class prodotti
                         $input[$i]['ID'] = sanitize_text_field($input[$i]['ID']);
                         $input[$i]['name'] = sanitize_text_field($input[$i]['name']);
                 }
-                if(!empty($input['new']['ID']) && !empty($input['new']['name']) && !check_duplicate_id($input['new']['ID'], $this->fields)) {
+                if(!empty($input['new']['ID']) && !empty($input['new']['name']) && !$this->check_duplicate_id($input['new']['ID'], $this->fields)) {
                         $input[$size_fields]['ID'] = sanitize_text_field($input['new']['ID']);
                         $input[$size_fields]['name'] = sanitize_text_field($input['new']['name']);
                 }
