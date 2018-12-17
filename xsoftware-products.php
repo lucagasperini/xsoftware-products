@@ -220,17 +220,21 @@ class xsproducts
                 }
                 
                 unset($input);
-                return $input;
         }
 
         function input_products($input)
         {
-                $this->update_products($input);
-                $this->insert_products($input);
-                $this->remove_products($input);
+                if(!empty($input['new']['id']) && !$this->check_duplicate($input['new']['id'], $this->options, 'id'))
+                        $this->insert_products($input['new']);
                 
+                unset($input['new']);
+                if(!empty($input['delete'])) 
+                        $this->remove_products($input['delete']);
+                        
+                unset($input['delete']);
+                
+                $this->update_products($input);
                 unset($input);
-                return $input;
         }
         
         function update_products($input)
@@ -259,39 +263,32 @@ class xsproducts
         
         function insert_products($input)
         {
-                $size_products = count($this->options);
                 $size_fields = count($this->fields);
+                
                 $sql_insert = 'INSERT INTO products (';
-                if(!empty($input['new']['id']) && !$this->check_duplicate($input['new']['id'], $this->options, 'id')) {
-                        for($k = 0; $k < $size_fields; $k++) {
-                                $current_field = $this->fields[$k]['Field'];
-                                $sql_insert .= '`' . $current_field . '`';
-                                if($k < $size_fields - 1)
-                                        $sql_insert .= ', ';
-                                else
-                                        $sql_insert .= ' ) VALUES ( ';
+                for($i = 0; $i < $size_fields; $i++) {
+                        $current_field = $this->fields[$i]['Field'];
+                        $sql_insert .= '`' . $current_field . '`';
+                        if($i < $size_fields - 1)
+                                $sql_insert .= ', ';
+                        else
+                                $sql_insert .= ' ) VALUES ( ';
                                 
-                        }
-                        for($k = 0; $k < $size_fields; $k++) {
-                                $current_field = $this->fields[$k]['Field'];
-                                $sql_insert .= '"' . $input['new'][$current_field] . '"';
-                                if($k < $size_fields - 1)
-                                        $sql_insert .= ', ';
-                                else
-                                        $sql_insert .= ' )';
-                                
-                        }
-                        $this->execute_query($sql_insert);
                 }
+                for($i = 0; $i < $size_fields; $i++) {
+                        $current_field = $this->fields[$i]['Field'];
+                        $sql_insert .= '"' . $input[$current_field] . '"';
+                        if($i < $size_fields - 1)
+                                $sql_insert .= ', ';
+                        else
+                                $sql_insert .= ' )';
+                }
+                $this->execute_query($sql_insert);
         }
         
         function remove_products($input)
         {
-                $sql_delete = 'DELETE FROM products WHERE `id`=';
-                if(!empty($input['delete'])) {
-                        $sql_delete .= '"' . $input['delete'] . '"';
-                        $this->execute_query($sql_delete);
-                }
+                $this->execute_query('DELETE FROM products WHERE `id`= "'. $input . '"');
         }
         
         function show_globals()
@@ -315,8 +312,8 @@ class xsproducts
                 $size = count($this->fields);
                 for($i = 0; $i < $size; $i++) {
                 echo "<tr>
-                <td><input readonly type='text' name='product_field[".$i."][Field]' value='".$this->fields[$i]['Field']."'></td>
-                <td><input type='text' name='product_field[".$i."][Type]' value='".$this->fields[$i]['Type']."'></td>
+                <td>".$this->fields[$i]['Field']."</td>
+                <td>".$this->fields[$i]['Type']."</td>
                 </tr>";
                 }
 
