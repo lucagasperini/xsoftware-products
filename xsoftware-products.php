@@ -58,6 +58,7 @@ class xsproducts
                 $this->fields = $this->get_fields();
                 $this->options = $this->get_products();
                 add_shortcode( 'xsoftware_dpc_products', array($this, 'dpc') );
+                add_shortcode( 'xsoftware_spc_products', array($this, 'spc') );
                 
         }
         
@@ -375,6 +376,16 @@ class xsproducts
                         products_single($product);
 
                 return ob_get_clean();
+        }
+        /* Shortcode Page Content */
+        function spc( $attr )
+        {
+                $attr = shortcode_atts( array( 'product' => '' , 'field' => ''), $attr );
+                
+                for($i = 0; $i < count($this->options); $i++)
+                        if($this->options[$i]['id'] == $attr['product'])
+                                $product = $this->options[$i];
+                echo $product[$attr['field']];
         }
 
 }
