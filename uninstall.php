@@ -12,6 +12,6 @@ $conn = new mysqli($options['db_host'], $options['db_user'], $options['db_pass']
 if (mysqli_connect_error()) {
         die("Connection to database failed: " . mysqli_connect_error());
 }
-$conn->query("DROP TABLE products;");
+$conn->query("DROP TABLE xs_products;");
 delete_option('product_global');
 ?>

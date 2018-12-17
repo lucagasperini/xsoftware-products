@@ -38,10 +38,6 @@ class xsproducts
                              );
 
         private $def_global = array ( 
-                                        'db_host' => 'localhost',
-                                        'db_user' => 'products_user',
-                                        'db_pass' => 'products_password',
-                                        'db_name' => 'products',
                                         'template_file' => 'template.php'
         );
         
@@ -69,8 +65,8 @@ class xsproducts
         {
                 if(isset($this->conn))
                         return;
-                        
-                $this->conn = new mysqli($this->globals['db_host'], $this->globals['db_user'], $this->globals['db_pass'], $this->globals['db_name']);
+                
+                $this->conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 
                 if (mysqli_connect_error()) {
                         die("Connection to database failed: " . mysqli_connect_error());
@@ -80,9 +76,9 @@ class xsproducts
                         $this->conn->query($this->conn, "SET NAMES 'utf8'"); 
                         $this->conn->query($this->conn, "SET CHARACTER SET 'utf8'"); 
                 } 
-                $result = $this->conn->query("SELECT 1 FROM `products` LIMIT 1");
+                $result = $this->conn->query("SELECT 1 FROM `xs_products` LIMIT 1");
                 if($result === FALSE)
-                        $this->conn->query("CREATE TABLE products ( `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY, `name` VARCHAR(256), `img` VARCHAR(256), `desc` VARCHAR(1024));");
+                        $this->conn->query("CREATE TABLE xs_products ( `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY, `name` VARCHAR(256), `img` VARCHAR(256), `desc` VARCHAR(1024));");
         }
         
         function execute_query($sql_query)
@@ -97,7 +93,7 @@ class xsproducts
         function get_fields()
         {
                 $offset = array();
-                $result = $this->execute_query("SHOW COLUMNS FROM products");
+                $result = $this->execute_query("SHOW COLUMNS FROM xs_products");
                 if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
                                 $offset[] = $row;
@@ -109,7 +105,7 @@ class xsproducts
         function get_products()
         {
                 $offset = array();
-                $result = $this->execute_query("SELECT * FROM products");
+                $result = $this->execute_query("SELECT * FROM xs_products");
                 if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
                                 $offset[] = $row;
@@ -197,11 +193,6 @@ class xsproducts
         
         function input_global($input)
         {
-                $input['db_host'] = sanitize_text_field( $input['db_host'] );
-                $input['db_user'] = sanitize_text_field( $input['db_user'] );
-                $input['db_pass'] = sanitize_text_field( $input['db_pass'] );
-                $input['db_name'] = sanitize_text_field( $input['db_name'] );
-                unset($this->conn);
                 $input['template_file'] = sanitize_text_field( $input['template_file'] );
                 return $input;
         }
@@ -209,11 +200,11 @@ class xsproducts
         function input_field($input)
         {
                 if(!empty($input['new']['Field']) && !empty($input['new']['Type']) && !$this->check_duplicate($input['new']['Field'], $this->fields, 'Field')) {
-                        $sql_query = 'ALTER TABLE products ADD `' . sanitize_text_field($input['new']['Field']) . '` '. $input['new']['Type'];
+                        $sql_query = 'ALTER TABLE xs_products ADD `' . sanitize_text_field($input['new']['Field']) . '` '. $input['new']['Type'];
                         $this->execute_query($sql_query);
                 }
                 if(!empty($input['delete'])) {
-                        $sql_query = 'ALTER TABLE products DROP `' . sanitize_text_field($input['delete']) . '`';
+                        $sql_query = 'ALTER TABLE xs_products DROP `' . sanitize_text_field($input['delete']) . '`';
                         $this->execute_query($sql_query);
                 }
                 
@@ -240,7 +231,7 @@ class xsproducts
                 $size_products = count($this->options);
                 $size_fields = count($this->fields);
                 
-                $sql_update = 'UPDATE products SET ';
+                $sql_update = 'UPDATE xs_products SET ';
                 for($i = 0; $i < $size_products; $i++) {
                         for($k = 0; $k < $size_fields; $k++) {
                                 $current_field = $this->fields[$k]['Field'];
@@ -250,7 +241,7 @@ class xsproducts
                                 } else {
                                         $sql_update .= ' WHERE id = "' . $input[$i]['id'] . '";';
                                         $this->execute_query($sql_update);
-                                        $sql_update = 'UPDATE products SET '; 
+                                        $sql_update = 'UPDATE xs_products SET '; 
                                 }
                                 
                         }
@@ -263,7 +254,7 @@ class xsproducts
         {
                 $size_fields = count($this->fields);
                 
-                $sql_insert = 'INSERT INTO products (';
+                $sql_insert = 'INSERT INTO xs_products (';
                 for($i = 0; $i < $size_fields; $i++) {
                         $current_field = $this->fields[$i]['Field'];
                         $sql_insert .= '`' . $current_field . '`';
@@ -286,15 +277,11 @@ class xsproducts
         
         function remove_products($input)
         {
-                $this->execute_query('DELETE FROM products WHERE `id`= "'. $input . '"');
+                $this->execute_query('DELETE FROM xs_products WHERE `id`= "'. $input . '"');
         }
         
         function show_globals()
         {
-                echo "Database host: <input type='text' name='product_global[db_host]' value='".$this->globals["db_host"]."'></br>";
-                echo "Database user: <input type='text' name='product_global[db_user]' value='".$this->globals["db_user"]."'></br>";
-                echo "Database pass: <input type='password' name='product_global[db_pass]' value='".$this->globals["db_pass"]."'></br>";
-                echo "Database name: <input type='text' name='product_global[db_name]' value='".$this->globals["db_name"]."'></br>";
                 echo "Template file path: <input type='text' name='product_global[template_file]' value='".$this->globals["template_file"]."'>";
         }
         
