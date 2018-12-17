@@ -15,6 +15,6 @@ function products_single($product)
         echo '<header class="entry-header"><h1 class="product_title">'.$product['name'].'</h1></header>';
         echo '<div class="product_content">';
         echo '<img class="product_img" src="'.$product['img'].'"/>';
-        echo '<p class="product_desc">'.$product['desc'].'</p>';
+        echo '<p class="product_descr">'.$product['descr'].'</p>';
 }
 ?>

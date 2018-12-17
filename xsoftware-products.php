@@ -15,7 +15,7 @@ class xsproducts
                                                'id'    =>   'awesome_product',
                                                'name'  =>   'An Awesome Product',
                                                'img'   =>   'https://i.kym-cdn.com/entries/icons/mobile/000/000/107/smily.jpg',
-                                               'desc'  =>   'This is an  very awesome product!'
+                                               'descr'  =>   'This is an  very awesome product!'
                                        )
                                      );
         private $def_field = array (
@@ -32,7 +32,7 @@ class xsproducts
                                              'type' => 'Image'
                                      ),
                                      array (
-                                             'Field' => 'desc',
+                                             'Field' => 'descr',
                                              'type' => 'Description'
                                      )
                              );
@@ -79,7 +79,7 @@ class xsproducts
                 } 
                 $result = $this->conn->query("SELECT 1 FROM `xs_products` LIMIT 1");
                 if($result === FALSE)
-                        $this->conn->query("CREATE TABLE xs_products ( `id` VARCHAR(256) NOT NULL PRIMARY KEY, `name` VARCHAR(256), `img` VARCHAR(256), `desc` VARCHAR(1024));");
+                        $this->conn->query("CREATE TABLE xs_products ( `id` VARCHAR(256) NOT NULL PRIMARY KEY, `name` VARCHAR(256), `img` VARCHAR(256), `descr` VARCHAR(1024));");
         }
         
         function execute_query($sql_query)
