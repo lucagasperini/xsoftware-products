@@ -20,19 +20,19 @@ class xsproducts
                                      );
         private $def_field = array (
                                      array (
-                                             'id' => 'ID',
-                                             'type' => 'ID'
+                                             'Field' => 'ID',
+                                             'Type' => 'ID'
                                      ),
                                      array (
-                                             'id' => 'name',
+                                             'Field' => 'name',
                                              'type' => 'Name'
                                      ),
                                      array (
-                                             'id' => 'img',
+                                             'Field' => 'img',
                                              'type' => 'Image'
                                      ),
                                      array (
-                                             'id' => 'desc',
+                                             'Field' => 'desc',
                                              'type' => 'Description'
                                      )
                              );
@@ -69,6 +69,9 @@ class xsproducts
         
         function init_db()
         {
+                if(isset($this->conn))
+                        return;
+                        
                 $this->conn = new mysqli($this->globals['db_host'], $this->globals['db_user'], $this->globals['db_pass'], $this->globals['db_name']);
 
                 if (mysqli_connect_error()) {
@@ -133,8 +136,8 @@ class xsproducts
 
                 if(WP_DEBUG == true) {
                         var_dump($this->options);
-                        //var_dump($this->fields);
-                        //var_dump($this->globals);
+                        var_dump($this->fields);
+                        var_dump($this->globals);
                 }
 
                 echo '<h2>Products configuration</h2>';
@@ -184,11 +187,11 @@ class xsproducts
                 add_settings_section( 'section_products', 'List of products', array($this, 'show_products'), 'products' );
         }
 
-        function check_duplicate_id($key, $array)
+        function check_duplicate($key, $array, $field)
         {
                 $size = count($array);
                 for($i = 0; $i < $size; $i++)
-                        if($array[$i]['id'] == $key)
+                        if($array[$i][$field] == $key)
                                 return true;
                 
                 return false;
@@ -200,13 +203,14 @@ class xsproducts
                 $input['db_user'] = sanitize_text_field( $input['db_user'] );
                 $input['db_pass'] = sanitize_text_field( $input['db_pass'] );
                 $input['db_name'] = sanitize_text_field( $input['db_name'] );
+                unset($this->conn);
                 $input['template_file'] = sanitize_text_field( $input['template_file'] );
                 return $input;
         }
         
         function input_field($input)
         {
-                if(!empty($input['new']['Field']) && !empty($input['new']['Type']) && !$this->check_duplicate_id($input['new']['Field'], $this->fields)) {
+                if(!empty($input['new']['Field']) && !empty($input['new']['Type']) && !$this->check_duplicate($input['new']['Field'], $this->fields, 'Field')) {
                         $sql_query = 'ALTER TABLE products ADD `' . sanitize_text_field($input['new']['Field']) . '` '. $input['new']['Type'];
                         $this->execute_query($sql_query);
                 }
@@ -215,7 +219,7 @@ class xsproducts
                         $this->execute_query($sql_query);
                 }
                 
-                //unset($input);
+                unset($input);
                 return $input;
         }
 
@@ -258,7 +262,7 @@ class xsproducts
                 $size_products = count($this->options);
                 $size_fields = count($this->fields);
                 $sql_insert = 'INSERT INTO products (';
-                if(!empty($input['new']['id']) && !$this->check_duplicate_id($input['new']['id'], $this->options)) {
+                if(!empty($input['new']['id']) && !$this->check_duplicate($input['new']['id'], $this->options, 'id')) {
                         for($k = 0; $k < $size_fields; $k++) {
                                 $current_field = $this->fields[$k]['Field'];
                                 $sql_insert .= '`' . $current_field . '`';
@@ -345,7 +349,7 @@ class xsproducts
                         echo "<tr>";
                         for($k = 0; $k < $size_field; $k++) {
                                 $current_field = $this->fields[$k]['Field'];
-                                if($current_field == "id")
+                                if($current_field == "Field")
                                 echo "<td><textarea readonly name='product_value[".$i."][".$current_field."]'>".$this->options[$i][$current_field]."</textarea></td>";
                                 else
                                 echo "<td><textarea name='product_value[".$i."][".$current_field."]'>".$this->options[$i][$current_field]."</textarea></td>";
