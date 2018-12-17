@@ -55,8 +55,6 @@ class xsproducts
 
         public function __construct()
         {
-                delete_option('product_value');
-                delete_option('product_field');
                 add_action('admin_menu', array($this, 'admin_menu'));
                 add_action('admin_init', array($this, 'section_menu'));
                 $this->globals = get_option('product_global', $this->def_global);
