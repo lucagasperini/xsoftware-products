@@ -7,7 +7,7 @@ if (!defined('WP_UNINSTALL_PLUGIN'))
 
 $options = get_option('product_global');
 
-$conn = new mysqli($options['db_host'], $options['db_user'], $options['db_pass'], $options['db_name']);
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 
 if (mysqli_connect_error()) {
         die("Connection to database failed: " . mysqli_connect_error());
