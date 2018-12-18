@@ -11,13 +11,6 @@ if(!defined('ABSPATH')) exit;
 
 class xsproducts
 {
-        private $def_product = array ( array (
-                                               'id'    =>   'awesome_product',
-                                               'name'  =>   'An Awesome Product',
-                                               'img'   =>   'https://i.kym-cdn.com/entries/icons/mobile/000/000/107/smily.jpg',
-                                               'descr'  =>   'This is an  very awesome product!'
-                                       )
-                                     );
         private $def_field = array (
                                      array (
                                              'Field' => 'ID',
