@@ -361,11 +361,6 @@ class xsproducts
                 include $this->globals["template_file"];
                 ob_start();
 
-                if(!isset( $_GET['product'] )) {
-                        products_main($this->options);
-                        return;
-                }
-
                 for($i = 0; $i < count($this->options); $i++)
                         if($this->options[$i]['id'] == $_GET['product'])
                                 $product = $this->options[$i];
