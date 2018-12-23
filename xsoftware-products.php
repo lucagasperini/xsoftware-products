@@ -72,7 +72,7 @@ class xsproducts
                 } 
                 $result = $this->conn->query("SELECT 1 FROM `xs_products` LIMIT 1");
                 if($result === FALSE)
-                        $this->conn->query("CREATE TABLE xs_products ( `id` VARCHAR(64) NOT NULL PRIMARY KEY, `name` VARCHAR(256), `img` VARCHAR(256), `descr` VARCHAR(1024));");
+                        $this->conn->query("CREATE TABLE xs_products ( `id` INT(11) NOT NULL PRIMARY KEY, `name` VARCHAR(64) NOT NULL, `lang` VARCHAR(5) NOT NULL, `img` VARCHAR(256), `descr` VARCHAR(1024));");
         }
         
         function execute_query($sql_query)
