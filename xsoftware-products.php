@@ -72,7 +72,7 @@ class xsproducts
                 } 
                 $result = $this->conn->query("SELECT 1 FROM `xs_products` LIMIT 1");
                 if($result === FALSE)
-                        $this->conn->query("CREATE TABLE xs_products ( `id` INT(11) NOT NULL PRIMARY KEY, `name` VARCHAR(64) NOT NULL, `lang` VARCHAR(5) NOT NULL, `img` VARCHAR(256), `descr` VARCHAR(1024));");
+                        $this->conn->query("CREATE TABLE xs_products ( `id` INT(11) NOT NULL PRIMARY KEY, `name` VARCHAR(64) NOT NULL, `lang` VARCHAR(16) NOT NULL, `img` VARCHAR(256), `descr` VARCHAR(1024));");
         }
         
         function execute_query($sql_query)
@@ -313,6 +313,7 @@ class xsproducts
         
         function show_products()
         {
+                include 'languages.php';
                 echo "<table class='product_admin_tbl'><tr>";
 
                 $size_field = count($this->fields);
@@ -325,10 +326,13 @@ class xsproducts
                         echo "<tr>";
                         for($k = 0; $k < $size_field; $k++) {
                                 $current_field = $this->fields[$k]['Field'];
-                                if($current_field == "Field")
-                                echo "<td><textarea readonly name='product_value[".$i."][".$current_field."]'>".$this->options[$i][$current_field]."</textarea></td>";
+                                if ($current_field == "lang") {
+                                        echo '<td><select name="product_value['.$i.'][lang]">';
+                                        xs_language::languages_options($this->options[$i]['lang']);
+                                        echo "</select></td>";
+                                }
                                 else
-                                echo "<td><textarea name='product_value[".$i."][".$current_field."]'>".$this->options[$i][$current_field]."</textarea></td>";
+                                        echo "<td><textarea name='product_value[".$i."][".$current_field."]'>".$this->options[$i][$current_field]."</textarea></td>";
                         }
                         echo "</tr>";
                 }
