@@ -353,19 +353,35 @@ class xsproducts
         }
 
         /* Dynamic Page Content */
-        function dpc ()
+        function dpc ($attr)
         {
                 include $this->globals["template_file"];
+                $attr = shortcode_atts( array( 'lang' => ''), $attr );
+                $products = array();
+                
+                if(!empty($attr['lang']))
+                {
+                        
+                        $result = $this->execute_query('SELECT * FROM xs_products WHERE lang="' . $attr['lang'] . '"');
+                        if ($result->num_rows > 0) {
+                                while ($row = $result->fetch_assoc()) {
+                                        $products[] = $row;
+                                }
+                        }
+                }
+                else {
+                        $products = $this->options;
+                }
                 ob_start();
 
-                for($i = 0; $i < count($this->options); $i++)
-                        if($this->options[$i]['name'] == $_GET['product'])
-                                $product = $this->options[$i];
+                for($i = 0; $i < count($products); $i++)
+                        if($products[$i]['name'] == $_GET['product'])
+                                $single = $products[$i];
 
-                if(!isset($product))
-                        products_main($this->options);
+                if(!isset($single))
+                        products_main($products);
                 else
-                        products_single($product);
+                        products_single($single);
 
                 return ob_get_clean();
         }
