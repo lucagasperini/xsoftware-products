@@ -284,30 +284,27 @@ class xs_products_plugin
         ?>
                 <table id='product_admin_tbl'>
                 <tr>
+                <th>Actions</th>
                 <th>Name</th>
                 <th>Type</th>
                 </tr>
         <?php
                 $size = count($this->fields);
                 for($i = 0; $i < $size; $i++) {
-                echo "<tr>
-                <td>".$this->fields[$i]['Field']."</td>
-                <td>".$this->fields[$i]['Type']."</td>
-                </tr>";
+                echo '<tr>
+                <td><button name="product_field[delete]" value="'.$this->fields[$i]['Field'].'">Remove</button></td>
+                <td>'.$this->fields[$i]['Field'].'</td>
+                <td>'.$this->fields[$i]['Type'].'</td>
+                </tr>';
                 }
 
 
                 echo "<tr>
+                <td></td>
                 <td><input type='text' name='product_field[new][Field]' placeholder='Add Name..'></td>
                 <td><input type='text' name='product_field[new][Type]' placeholder='Add Type..'></td>
                 </tr>
                 </table>";
-                
-                echo 'Delete field: <select name="product_field[delete]">';
-                echo '<option value=0 selected></option>'; //DEFAULT OPTION
-                for($i = 0; $i < $size; $i++)
-                echo '<option value="'. $this->fields[$i]['Field'] .'">'.$this->fields[$i]['Field'].'</option>';
-                echo '</select>';
 
         }
         
