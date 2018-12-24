@@ -9,7 +9,7 @@ Text Domain: xsoftware_products
 */
 if(!defined('ABSPATH')) exit;
 
-class xsproducts
+class xs_products_plugin
 {
         private $def_field = array (
                                      array (
@@ -402,6 +402,6 @@ class xsproducts
 
 }
 
-$plugin_product = new xsproducts();
+$plugin_product = new xs_products_plugin();
 
 ?>
