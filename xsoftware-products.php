@@ -282,7 +282,7 @@ class xsproducts
         function show_fields()
         {
         ?>
-                <table class='product_admin_tbl'>
+                <table id='product_admin_tbl'>
                 <tr>
                 <th>Name</th>
                 <th>Type</th>
@@ -314,16 +314,18 @@ class xsproducts
         function show_products()
         {
                 include 'languages.php';
-                echo "<table class='product_admin_tbl'><tr>";
+                echo '<table class="product_admin_tbl"><tr>';
 
                 $size_field = count($this->fields);
+                echo '<th>Actions</th>';
                 for($i = 0; $i < $size_field; $i++)
-                        echo "<th>".$this->fields[$i]['Field']."</th>";
-                echo "</tr>";
+                        echo '<th>'.$this->fields[$i]['Field'].'</th>';
+                echo '</tr>';
 
                 $size_products = count($this->options);
                 for($i = 0; $i < $size_products; $i++) {
-                        echo "<tr>";
+                        echo '<tr>';
+                        echo '<td><button name=product_value[delete] value="'.$this->options[$i]['id'].'">Remove</button></td>';
                         for($k = 0; $k < $size_field; $k++) {
                                 $current_field = $this->fields[$k]['Field'];
                                 if ($current_field == "lang") {
@@ -338,18 +340,20 @@ class xsproducts
                 }
 
 
-                echo "<tr>";
-
-                for($i = 0; $i < $size_field; $i++)
-                        echo "<td><textarea name='product_value[new][".$this->fields[$i]['Field']."]' placeholder='Add ".$this->fields[$i]['Field']."..'></textarea></td>";
+                echo '<tr>';
+                echo '<td></td>';
+                for($i = 0; $i < $size_field; $i++) {
+                        $current_field = $this->fields[$i]['Field'];
+                        if($current_field == "lang") {
+                                echo '<td><select name="product_value[new][lang]">';
+                                xs_language::__languages_options();
+                                echo "</select></td>";
+                        } else {
+                                echo "<td><textarea name='product_value[new][".$current_field."]' placeholder='Add ".$current_field."..'></textarea></td>";
+                        }
+                }
 
                 echo "</tr></table>";
-                
-                echo 'Delete record: <select name="product_value[delete]">';
-                echo '<option value=0 selected></option>'; //DEFAULT OPTION
-                for($i = 0; $i < $size_products; $i++)
-                echo '<option value="'.$this->options[$i]['id'].'">'.$this->options[$i]['id'].'</option>';
-                echo '</select>';
         }
 
         /* Dynamic Page Content */

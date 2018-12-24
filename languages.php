@@ -212,5 +212,10 @@ class xs_language
                                 echo '<option value="'. $key .'">'.$value.'</option>';
                 }
         }
+        static public function __languages_options()
+        {
+                foreach(self::$country_languages as $key => $value )
+                        echo '<option value="'. $key .'">'.$value.'</option>';
+        }
 }
 ?>

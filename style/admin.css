@@ -1,24 +1,21 @@
-.product_admin_tbl {
-    border-collapse: collapse;
-    width: 100%;
+#product_admin_tbl {
+        border-collapse: collapse;
+        overflow:auto;  
 }
-
 td {
-    border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
 }
 
-td > * {
-        width: 100%;
-}
 
 th {
-    border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
 }
 
+
 tr:nth-child(even) {
-    background-color: #dddddd;
+        background-color: #dddddd;
 }
