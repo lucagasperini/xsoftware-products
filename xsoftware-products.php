@@ -215,6 +215,9 @@ class xs_products_plugin
                                 echo '<td><select name="product_value[new][lang]">';
                                 xs_language::__languages_options();
                                 echo "</select></td>";
+                        }
+                        else if($current_field == "id") {
+                                echo "<td></td>"; //Skip ID
                         } else {
                                 echo "<td><textarea name='product_value[new][".$current_field."]' placeholder='Add ".$current_field."..'></textarea></td>";
                         }
@@ -226,7 +229,6 @@ class xs_products_plugin
         /* Dynamic Page Content */
         function dpc ($attr)
         {
-                
                 include $this->globals["template_file"];
                 $attr = shortcode_atts( array( 'lang' => ''), $attr );
                 $products = array();
