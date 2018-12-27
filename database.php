@@ -39,6 +39,31 @@ class xs_products_database
                 return $offset;
         }
         
+        function prepared_query($query)
+        {
+                $offset = array();
+                if(!$query->execute()) {
+                        echo "Could not run query: SQL_ERROR -> " . $query->error . " SQL_QUERY -> " . $string;
+                        exit;
+                }
+                $meta = $query->result_metadata(); 
+                while ($field = $meta->fetch_field()) 
+                { 
+                        $params[] = &$row[$field->name]; 
+                } 
+
+                call_user_func_array(array($query, 'bind_result'), $params); 
+
+                while ($query->fetch()) { 
+                        foreach($row as $key => $val) 
+                        { 
+                                $c[$key] = $val; 
+                        } 
+                        $offset[] = $c; 
+                }
+                return $offset;
+        }
+        
         function fields_get()
         {
                 $offset = array();
@@ -82,10 +107,16 @@ class xs_products_database
                 $this->execute_query($sql_query);
         }
         
-        function products_get()
+        function products_get($lang = NULL)
         {
                 $offset = array();
-                $result = $this->execute_query("SELECT * FROM xs_products");
+                
+                if($lang != NULL)
+                        $string = "SELECT * FROM xs_products WHERE lang=\"" . $lang . "\"";
+                else
+                        $string = "SELECT * FROM xs_products";
+                        
+                $result = $this->execute_query($string);
                 if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
                                 $offset[] = $row;
@@ -94,15 +125,16 @@ class xs_products_database
                 return $offset;
         }
         
-        function products_get_lang($lang)
+        function products_get_by_name($name, $lang = NULL)
         {
-                $offset = array();
-                $result = $this->execute_query('SELECT * FROM xs_products WHERE lang="' . $lang . '"');
-                if ($result->num_rows > 0) {
-                        while ($row = $result->fetch_assoc()) {
-                                $offset[] = $row;
-                        }
-                }
+                if($lang != NULL)
+                        $string = "SELECT * FROM xs_products WHERE lang=\"" . $lang . "\" AND name=?";
+                else
+                        $string = "SELECT * FROM xs_products WHERE name=?";
+
+                $query = $this->conn->prepare($string);
+                $query->bind_param("s", $name);
+                $offset = $this->prepared_query($query);
                 return $offset;
         }
         

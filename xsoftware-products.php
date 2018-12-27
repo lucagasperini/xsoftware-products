@@ -230,38 +230,35 @@ class xs_products_plugin
         function dpc ($attr)
         {
                 include $this->globals["template_file"];
-                $attr = shortcode_atts( array( 'lang' => ''), $attr );
+                $attr = shortcode_atts( array( 'lang' => '', 'product' => '' , 'field' => ''), $attr );
                 $products = array();
+                $lang = NULL;
                 
                 if(!empty($attr['lang']))
-                        $products = $this->db->products_get_lang($attr['lang']);
-                else
-                        $products = $this->db->products_get();
-
-                if(!isset($_GET['product'])) {
-                        products_main($products);
-                        return;
+                        $lang =  $attr['lang'];
+                        
+                if(isset($_GET['product']))
+                        $name = $_GET['product'];
+                if(!empty($attr['product']))
+                        $name = $attr['product'];
+                        
+                if(isset($name)) {
+                        $single = $this->db->products_get_by_name($name,$lang);
+                        if(count($single) != 1)
+                                unset($single);
+                        else
+                                $single = $single[0];
                 }
-                for($i = 0; $i < count($products); $i++)
-                        if($products[$i]['name'] == $_GET['product'])
-                                $single = $products[$i];
-
                 if(!isset($single))
-                        products_main($products);
-                else
+                        $products = $this->db->products_get($lang);
+                
+                
+                if(isset($single) && empty($attr['field']))
                         products_single($single);
-        }
-        /* Shortcode Page Content */
-        function spc( $attr )
-        {
-                $products = $this->db->products_get();
-                
-                $attr = shortcode_atts( array( 'product' => '' , 'field' => ''), $attr );
-                
-                for($i = 0; $i < count($products); $i++)
-                        if($products[$i]['id'] == $attr['product'])
-                                $product = $products[$i];
-                echo $product[$attr['field']];
+                if(isset($single) && !empty($attr['field']))
+                        echo $single[$attr['field']];
+                if(isset($products))
+                        products_main($products);
         }
 
 }
