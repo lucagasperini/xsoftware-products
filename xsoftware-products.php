@@ -213,7 +213,7 @@ class xs_products_plugin
                         $current_field = $fields[$i]['Field'];
                         if($current_field == "lang") {
                                 echo '<td><select name="product_value[new][lang]">';
-                                xs_language::__languages_options();
+                                xs_language::languages_options();
                                 echo "</select></td>";
                         }
                         else if($current_field == "id") {
