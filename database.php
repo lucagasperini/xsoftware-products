@@ -138,6 +138,19 @@ class xs_products_database
                 return $offset;
         }
         
+        function products_exists($name, $lang = NULL)
+        {
+                if($lang != NULL)
+                        $string = "SELECT COUNT(id) FROM xs_products WHERE lang=\"" . $lang . "\" AND name=?";
+                else
+                        $string = "SELECT COUNT(id) FROM xs_products WHERE name=?";
+
+                $query = $this->conn->prepare($string);
+                $query->bind_param("s", $name);
+                $offset = $this->prepared_query($query);
+                return $offset[0]["COUNT(id)"] == 1;
+        }
+        
         function products_count()
         {
                 $result = $this->execute_query("SELECT count(id) FROM xs_products");
@@ -162,7 +175,8 @@ class xs_products_database
                                         $sql_update .= ', ';
                                 } else {
                                         $sql_update .= ' WHERE id = "' . $input[$i]['id'] . '";';
-                                        $this->execute_query($sql_update);
+                                        if( !$this->products_exists($input[$i]["name"], $input[$i]["lang"]))
+                                                $this->execute_query($sql_update);
                                         $sql_update = 'UPDATE xs_products SET '; 
                                 }
                                 
@@ -173,6 +187,8 @@ class xs_products_database
         
         function products_add($input)
         {
+                if( $this->products_exists($input["name"], $input["lang"]))
+                        return;
                 $fields = $this->fields_get_skip(array('id'));
                 $size_fields = count($fields);
                 
