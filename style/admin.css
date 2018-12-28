@@ -1,13 +1,13 @@
 #product_admin_tbl {
         border-collapse: collapse;
-        overflow:auto;  
+        overflow:auto;
+        width: 100%;
 }
 td {
         border: 1px solid #dddddd;
         text-align: left;
         padding: 8px;
 }
-
 
 th {
         border: 1px solid #dddddd;
@@ -18,4 +18,22 @@ th {
 
 tr:nth-child(even) {
         background-color: #dddddd;
+}
+
+.show_button {
+        text-decoration:none;
+    text-align: center;
+    padding: 10px;
+    font-size: 16px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    background-color: #ffb342;
+    color: black;
+    border: 2px solid black;
+    width: 100%; 
+}
+
+.show_button:hover {
+    background-color: black;
+    color: #ffb342;
 }

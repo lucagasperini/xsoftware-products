@@ -107,14 +107,20 @@ class xs_products_database
                 $this->execute_query($sql_query);
         }
         
-        function products_get($lang = NULL)
+        function products_get($lang = NULL, $id = NULL)
         {
                 $offset = array();
-                
-                if($lang != NULL)
-                        $string = "SELECT * FROM xs_products WHERE lang=\"" . $lang . "\"";
-                else
+                $string = NULL;
+
+                if($lang == NULL && $id == NULL)
                         $string = "SELECT * FROM xs_products";
+                if($lang == NULL && $id != NULL)
+                        $string = "SELECT * FROM xs_products WHERE id=\"".$id."\"";
+                if($lang != NULL && $id == NULL)
+                        $string = "SELECT * FROM xs_products WHERE lang=\"" . $lang . "\"";
+                if($lang != NULL && $id != NULL)
+                        $string = "SELECT * FROM xs_products WHERE id=\"".$id."\" AND lang=\"" . $lang . "\"";
+                        
                         
                 $result = $this->execute_query($string);
                 if ($result->num_rows > 0) {
@@ -137,7 +143,21 @@ class xs_products_database
                 $offset = $this->prepared_query($query);
                 return $offset;
         }
-        
+        function products_get_id($name, $lang = NULL)
+        {
+                if($lang != NULL)
+                        $string = "SELECT id FROM xs_products WHERE lang=\"" . $lang . "\" AND name=?";
+                else
+                        $string = "SELECT id FROM xs_products WHERE name=?";
+
+                $query = $this->conn->prepare($string);
+                $query->bind_param("s", $name);
+                $offset = $this->prepared_query($query);
+                if(isset($offset[0]))
+                        return $offset[0]["id"];
+                else
+                        return -1;
+        }
         function products_exists($name, $lang = NULL)
         {
                 if($lang != NULL)
@@ -161,25 +181,32 @@ class xs_products_database
         
         function products_update($input)
         {
-                $size_products = $this->products_count();
+                $size_products = count($input);
                 
                 $fields = $this->fields_get();
                 $size_fields = count($fields);
                 
-                $sql_update = 'UPDATE xs_products SET ';
                 for($i = 0; $i < $size_products; $i++) {
-                        for($k = 0; $k < $size_fields; $k++) {
-                                $current_field = $fields[$k]['Field'];
-                                $sql_update .= '`' . $current_field . '` = "'. sanitize_text_field($input[$i][$current_field]) . '"';
-                                if($k < $size_fields - 1) {
-                                        $sql_update .= ', ';
-                                } else {
-                                        $sql_update .= ' WHERE id = "' . $input[$i]['id'] . '";';
-                                        if( !$this->products_exists($input[$i]["name"], $input[$i]["lang"]))
-                                                $this->execute_query($sql_update);
-                                        $sql_update = 'UPDATE xs_products SET '; 
-                                }
-                                
+                        $this->products_update_single($input[$i], $fields, $input[$i]['id']);
+                }
+        }
+        
+        function products_update_single($single, $fields, $id)
+        {
+                $size_fields = count($fields);
+                
+                $sql_update = 'UPDATE xs_products SET ';
+                for($k = 0; $k < $size_fields; $k++) {
+                        $current_field = $fields[$k]['Field'];
+                        $sql_update .= '`' . $current_field . '` = "'. sanitize_text_field($single[$current_field]) . '"';
+                        if($k < $size_fields - 1) {
+                                $sql_update .= ', ';
+                        } else {
+                                $sql_update .= ' WHERE id = "' . $id . '";';
+                                $found = $this->products_get_id($single["name"], $single["lang"]);
+                                if( $id == $found  || $found < 0)
+                                        $this->execute_query($sql_update);
+                        $sql_update = 'UPDATE xs_products SET '; 
                         }
                         
                 }
