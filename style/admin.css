@@ -22,18 +22,19 @@ tr:nth-child(even) {
 
 .show_button {
         text-decoration:none;
-    text-align: center;
-    padding: 10px;
-    font-size: 16px;
-    -webkit-transition-duration: 0.4s; /* Safari */
-    transition-duration: 0.4s;
-    background-color: #ffb342;
-    color: black;
-    border: 2px solid black;
-    width: 100%; 
+        text-align: center;
+        padding: 10px;
+        font-size: 16px;
+        -webkit-transition-duration: 0.4s; /* Safari */
+        transition-duration: 0.4s;
+        background-color: #ffb342;
+        color: black;
+        border: 2px solid black;
+        width: 100%; 
+        display: inherit;
 }
 
 .show_button:hover {
-    background-color: black;
-    color: #ffb342;
+        background-color: black;
+        color: #ffb342;
 }

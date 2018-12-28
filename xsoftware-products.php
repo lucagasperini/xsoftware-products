@@ -81,23 +81,21 @@ class xs_products_plugin
         
         public function show_products_edit()
         {
-                if(isset($_GET["id"]))
-                        $products = $this->db->products_get(NULL, $_GET["id"]);
-                else
-                        $products = $this->db->products_get();
-                
-                $fields = $this->db->fields_get();
-                
-                
-                        
                 echo '<table class="product_admin_tbl">';
-                
-                if(isset($_GET["id"])){
-                        $this->show_product_edit_single($products[0], $fields);
+                $fields = $this->db->fields_get();
+                if(isset($_GET["id"])) {
+                        if($_GET["id"] == "new") {
+                                $this->show_product_edit_add($fields);
+                        } else {
+                                $products = $this->db->products_get(NULL, $_GET["id"]);
+                                if(isset($products[0]))
+                                        $this->show_product_edit_single($products[0], $fields);
+                        }
                 } else {
+                        $products = $this->db->products_get();
                         $this->show_product_edit_all($products, $fields);
                 }
-
+                
                 echo "</table>";
                         
                 
@@ -140,24 +138,7 @@ class xs_products_plugin
                 for($i = 0; $i < $size_fields; $i++)
                         echo '<th>'.$fields[$i]['Field'].'</th>';
                 echo '</tr>';
-        
-                echo '<tr>';
-                echo '<td></td>';
-                for($i = 0; $i < $size_fields; $i++) {
-                        $current_field = $fields[$i]['Field'];
-                        if($current_field == "lang") {
-                                echo '<td><select name="product_value[new][lang]">';
-                                xs_language::languages_options();
-                                echo "</select></td>";
-                        }
-                        else if($current_field == "id") {
-                                echo "<td></td>"; //Skip ID
-                        } else {
-                                echo "<td><textarea name='product_value[new][".$current_field."]' placeholder='Add ".$current_field."..'></textarea></td>";
-                        }
-                }
-
-                echo "</tr>";
+                
                 for($i = 0; $i < $size_products; $i++) {
                         $id_product = $array[$i]['id'];
                         echo '<tr>';
@@ -179,6 +160,31 @@ class xs_products_plugin
                         echo "</tr>";
                 }
         
+        }
+        
+        public function show_product_edit_add($fields)
+        {
+                $size_fields = count($fields);
+                
+                echo '<tr><th>Field</th>';
+                echo '<th>Value</th></tr>';
+                
+               for($i = 0; $i < $size_fields; $i++) {
+                        echo '<tr>';
+                        $current_field = $fields[$i]['Field'];
+                        echo "<td>".$current_field."</td>";
+                        if($current_field == "lang") {
+                                echo "<td style='width: 100%;'><select style='width: 100%;' name='product_value[new][lang]'>";
+                                xs_language::languages_options();
+                                echo "</select></td>";
+                        }
+                        else if($current_field == "id") {
+                                echo "<td></td>"; //Skip ID
+                        } else {
+                                echo "<td style='width: 100%;'><textarea style='width: 100%;' name='product_value[new][".$current_field."]' placeholder='Add ".$current_field."..'></textarea></td>";
+                        }
+                        echo '<tr>';
+                }
         }
 
         public function menu_page()
@@ -293,6 +299,7 @@ class xs_products_plugin
         
         function show_products()
         {
+                echo "<a class=\"show_button\" href=\"admin.php?page=xsoftware_products_edit&id=new\">Add a product</a>";
                 echo '<table class="product_admin_tbl"><tr>';
 
                 $fields = $this->db->fields_get();
