@@ -32,7 +32,6 @@ class xs_products_plugin
                 $this->globals = get_option('product_global', $this->def_global);
                 $this->db = new xs_products_database();
                 add_shortcode( 'xsoftware_dpc_products', array($this, 'dpc') );
-                add_shortcode( 'xsoftware_spc_products', array($this, 'spc') );
                 
         }
         
