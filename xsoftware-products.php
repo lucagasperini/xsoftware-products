@@ -154,7 +154,7 @@ class xs_products_plugin
                 for($i = 0; $i < $size_products; $i++) {
                         $id_product = $array[$i]['id'];
                         echo '<tr>';
-                        echo '<td><button name=product_value[delete] value="'.$id_product.'">Remove</button></td>';
+                        echo '<td><button class="button-primary" name=product_value[delete] value="'.$id_product.'">Remove</button></td>';
                         for($k = 0; $k < $size_fields; $k++) {
                                 $current_field = $fields[$k]['Field'];
                                 if ($current_field == "lang") {
@@ -293,7 +293,7 @@ class xs_products_plugin
         <?php
                 for($i = 0; $i < $size_fields; $i++) {
                 echo '<tr>
-                <td><button name="product_field[delete]" value="'.$fields[$i]['Field'].'">Remove</button></td>
+                <td><button class="button-primary" name="product_field[delete]" value="'.$fields[$i]['Field'].'">Remove</button></td>
                 <td>'.$fields[$i]['Field'].'</td>
                 <td>'.$fields[$i]['Type'].'</td>
                 </tr>';
@@ -311,7 +311,7 @@ class xs_products_plugin
         
         function show_products()
         {
-                echo "<a class=\"show_button\" href=\"admin.php?page=xsoftware_products_edit&id=new\">Add a product</a>";
+                echo "<a class=\"button-primary\" href=\"admin.php?page=xsoftware_products_edit&id=new\">Add a product</a>";
                 echo '<table class="product_admin_tbl"><tr>';
 
                 $fields = $this->db->fields_get();
@@ -326,7 +326,7 @@ class xs_products_plugin
 
                 for($i = 0; $i < $size_products; $i++) {
                         echo '<tr>';
-                        echo '<td><a class="show_button" href="admin.php?page=xsoftware_products_edit&id='.$products[$i]['id'].'">Show</a></td>';
+                        echo '<td><a class="button-primary" href="admin.php?page=xsoftware_products_edit&id='.$products[$i]['id'].'">Show</a></td>';
                         for($k = 0; $k < $size_fields; $k++) {
                                 $current_field = $fields[$k]['Field'];
                                 echo "<td>".$products[$i][$current_field]."</td>";
