@@ -19,7 +19,7 @@
     display: block;
     margin: 1%;
     width:20%;
-    height:350px;
+    height:20%;
     float:left;
     text-decoration:none;
 }
@@ -38,8 +38,8 @@
     display: block;
     margin-left: auto;
     margin-right: auto;
-    width:70px;
-    height:300px;
+    width:20%;
+    height:20%;
 }
 
 .product_img {
