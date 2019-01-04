@@ -219,9 +219,6 @@ class xs_products_database
                 $fields = $this->fields_get_skip(array('id'));
                 $size_fields = count($fields);
                 
-                $size_fields = $size_fields - 1;
-                
-                
                 $sql_insert = 'INSERT INTO xs_products (';
                 for($i = 0; $i < $size_fields; $i++) {
                         $current_field = $fields[$i]['Field'];
