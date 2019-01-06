@@ -60,7 +60,7 @@ class xs_products_plugin
                         wp_die( __( 'Exit!' ) );
                 }
                 
-                wp_enqueue_style('products_style', plugins_url('style/admin.css', __FILE__));
+                xs_framework::init_admin_style();
                 
                 echo '<div class="wrap">';
                 echo '<h2>Products configuration</h2>';
@@ -312,29 +312,25 @@ class xs_products_plugin
         function show_products()
         {
                 echo "<a class=\"button-primary\" href=\"admin.php?page=xsoftware_products_edit&id=new\">Add a product</a>";
-                echo '<table class="product_admin_tbl"><tr>';
 
                 $fields = $this->db->fields_get();
-                $size_fields = count($fields);
                 $products = $this->db->products_get();
-                $size_products = count($products);
                 
-                echo '<th>Actions</th>';
-                for($i = 0; $i < $size_fields; $i++)
-                        echo '<th>'.$fields[$i]['Field'].'</th>';
-                echo '</tr>';
-
-                for($i = 0; $i < $size_products; $i++) {
-                        echo '<tr>';
-                        echo '<td><a class="button-primary" href="admin.php?page=xsoftware_products_edit&id='.$products[$i]['id'].'">Show</a></td>';
-                        for($k = 0; $k < $size_fields; $k++) {
-                                $current_field = $fields[$k]['Field'];
-                                echo "<td>".$products[$i][$current_field]."</td>";
-                        }
-                        echo "</tr>";
+                $fields_name[] = "Actions";
+                foreach($fields as $single)
+                {
+                        $fields_name[] = $single["Field"];
                 }
-
-                echo "</table>";
+                
+                for($i = 0; $i < count($products); $i++)
+                {
+                        $actions = "<a class=\"button-primary\" href=\"admin.php?page=xsoftware_products_edit&id=".$products[$i]['id']."\">Show</a>";
+                        array_unshift($products[$i], $actions);
+                }
+                
+                $settings_field =  array("header" => $fields_name, "data" => $products);
+                
+                xs_framework::create_table($settings_field);
         }
 
         /* Dynamic Page Content */
