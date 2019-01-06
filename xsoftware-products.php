@@ -4,7 +4,7 @@ Plugin Name: XSoftware Products
 Description: Products management on wordpress.
 Version: 1.0
 Author: Luca Gasperini
-Author URI: https://xsoftware.eu/
+Author URI: https://xsoftware.it/
 Text Domain: xsoftware_products
 */
 if(!defined('ABSPATH')) exit;
@@ -341,8 +341,7 @@ class xs_products_plugin
         function dpc ($attr)
         {
                 include $this->globals["template_file"];
-                $attr = shortcode_atts( array( 'lang' => '', 'product' => '' , 'field' => ''), $attr );
-                $products = array();
+                extract( shortcode_atts( array( 'lang' => '', 'product' => '' , 'field' => ''), $attr ) );
                 $lang = NULL;
                 
                 if(!empty($attr['lang']))
@@ -350,7 +349,7 @@ class xs_products_plugin
                         
                 if(isset($_GET['product']))
                         $name = $_GET['product'];
-                if(!empty($attr['product']))
+                if(isset($attr['product']) && !empty($attr['product']))
                         $name = $attr['product'];
                         
                 if(isset($name)) {
