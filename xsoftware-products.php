@@ -79,16 +79,22 @@ class xs_products_plugin
         
         public function input_products_edit($input)
         {
-                if(!empty($input['new']['name']))
-                        $this->db->products_add($input['new']);
-                
-                unset($input['new']);
+                if(isset($input['new'])) {
+                        $add_product = $input['new']; // copy variable
+                        unset($input['new']); //unset new from input list
+                }
                 
                 if(!empty($input['delete'])) 
-                        $this->db->products_remove($input['delete']);
+                        $this->db->products_remove($input['delete']); //remove product from database first
+                        
+                unset($input['delete']);//unset new from input list
                 
-                unset($input['delete']);
-                $this->db->products_update($input);
+                $this->db->products_update($input); //update database with current input list
+                
+                if(!empty($add_product['name']))
+                        $this->db->products_add($add_product); //add new product ro database at end
+                
+                unset($input); // clear memory
         }
         
         public function show_products_edit()
