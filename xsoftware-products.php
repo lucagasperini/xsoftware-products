@@ -101,18 +101,17 @@ class xs_products_plugin
         public function show_products_edit()
         {
                 echo '<table class="product_admin_tbl">';
-                $fields = $this->db->fields_get();
+                
                 if(isset($_GET["id"])) {
                         if($_GET["id"] == "new") {
-                                $this->show_product_edit_add($fields);
+                                $this->show_product_edit_add();
                         } else {
                                 $products = $this->db->products_get(NULL, $_GET["id"]);
                                 if(isset($products[0]))
-                                        $this->show_product_edit_single($products[0], $fields);
+                                        $this->show_product_edit_single($products[0]);
                         }
                 } else {
-                        $products = $this->db->products_get();
-                        $this->show_product_edit_all($products, $fields);
+                        $this->show_product_edit_all();
                 }
                 
                 echo "</table>";
@@ -120,8 +119,9 @@ class xs_products_plugin
                 
         }
         
-        public function show_product_edit_single($single, $fields)
+        public function show_product_edit_single($single)
         {
+                $fields = $this->db->fields_get();
                 $size_fields = count($fields);
                 $id_product = $single['id'];
                 
@@ -147,41 +147,37 @@ class xs_products_plugin
                 }
         }
         
-        public function show_product_edit_all($array, $fields)
+        public function show_product_edit_all()
         {
-                $size_fields = count($fields);
-                $size_products = count($array);
-        
-                echo '<tr><th>Actions</th>';
-                for($i = 0; $i < $size_fields; $i++)
-                        echo '<th>'.$fields[$i]['Field'].'</th>';
-                echo '</tr>';
+                $products = $this->db->products_get();
+                $fields = $this->db->fields_get_name();
                 
-                for($i = 0; $i < $size_products; $i++) {
-                        $id_product = $array[$i]['id'];
-                        echo '<tr>';
-                        echo '<td><button class="button-primary" name=product_value[delete] value="'.$id_product.'">Remove</button></td>';
-                        for($k = 0; $k < $size_fields; $k++) {
-                                $current_field = $fields[$k]['Field'];
-                                if ($current_field == "lang") {
-                                        echo '<td><select name="product_value['.$i.'][lang]">';
-                                        xs_language::languages_options($array[$i]['lang']);
-                                        echo "</select></td>";
-                                }
-                                else if($current_field == "id") {
-                                        echo "<td><input type='text' name='product_value[".$i."][".$current_field."]' value='".$array[$i][$current_field]."' readonly></td>";
-                                }
-                                else {
-                                        echo "<td><textarea name='product_value[".$i."][".$current_field."]'>".$array[$i][$current_field]."</textarea></td>";
-                                }
+                for($i = 0; $i < count($products); $i++)
+                {
+                        $settings = array( 'name' => 'product_value[delete]', 'class' => 'button-primary', 'value' => $products[$i]['id'], 'text' => 'Remove', 'return' => true);
+                        $actions = xs_framework::create_button($settings);
+                        array_unshift($products[$i], $actions);
+                        foreach($fields as $current_field) {
+                                if($current_field == 'id')
+                                        $products[$i]['id'] = xs_framework::create_input(array('value' => $products[$i]['id'], 'name' => 'product_value['.$i.'][id]', 'readonly' => true, 'type' => 'text', 'return' => true));
+                                else if($current_field == 'lang')
+                                        $products[$i]['lang'] = xs_framework::create_select(array( 'name' => 'product_value['.$i.'][lang]', 'data' => xs_language::$language_codes, 'selected' => $products[$i]['lang'], 'reverse' => true, 'return' => true));
+                                else
+                                        $products[$i][$current_field] = xs_framework::create_textarea(array('text' => $products[$i][$current_field], 'name' => 'product_value['.$i.']['.$current_field.']', 'return' => true));
                         }
-                        echo "</tr>";
+                        
                 }
+                
+                array_unshift($fields, "Actions");
+                
+                $settings = array('headers' => $fields, 'data' => $products );
+                xs_framework::create_table($settings);
         
         }
         
-        public function show_product_edit_add($fields)
+        public function show_product_edit_add()
         {
+                $fields = $this->db->fields_get();
                 $size_fields = count($fields);
                 
                 echo '<tr><th>Field</th>';
@@ -335,7 +331,7 @@ class xs_products_plugin
                         array_unshift($products[$i], $actions);
                 }
                 
-                $settings_field =  array("header" => $fields_name, "data" => $products);
+                $settings_field =  array("headers" => $fields_name, "data" => $products);
                 
                 xs_framework::create_table($settings_field);
         }

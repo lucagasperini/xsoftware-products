@@ -135,6 +135,18 @@ class xs_products_database
                 return $offset;
         }
         
+        function fields_get_name()
+        {
+                $offset = array();
+                $result = $this->execute_query("SHOW COLUMNS FROM xs_products");
+                if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                                $offset[] = $row['Field'];
+                        }
+                }
+                return $offset;
+        }
+        
         function fields_get_skip($array)
         {
                 $offset = array();
@@ -143,6 +155,19 @@ class xs_products_database
                         while ($row = $result->fetch_assoc()) {
                                 if(!in_array($row['Field'], $array))
                                         $offset[] = $row;
+                        }
+                }
+                return $offset;
+        }
+        
+        function fields_get_name_skip($array)
+        {
+                $offset = array();
+                $result = $this->execute_query("SHOW COLUMNS FROM xs_products");
+                if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                                if(!in_array($row['Field'], $array))
+                                        $offset[] = $row['Field'];
                         }
                 }
                 return $offset;
