@@ -262,11 +262,10 @@ class xs_products_database
                 
                 foreach($fields as $current_field) {
                         $sql_update .= '`' . $current_field['Field'] . '`=?';
-                        if($current_field['Field'] != $last_field) { //if is not last element
+                        if($current_field['Field'] != $last_field) //if is not last element
                                 $sql_update .= ', '; //insert a comma
-                        } else {
+                        else
                                 $sql_update .= ' WHERE `id` = "' . $id . '";'; //add where clause
-                        }
                 }
                 
                 foreach($fields as $current_field) {
@@ -282,29 +281,39 @@ class xs_products_database
         function products_add($input)
         {
                 if( $this->products_exists($input["name"], $input["lang"]))
-                        return;
+                        return FALSE;
+                        
                 $fields = $this->fields_get_skip(array('id'));
+                
                 $size_fields = count($fields);
+                $last_field = $fields[$size_fields - 1]['Field'];
                 
                 $sql_insert = 'INSERT INTO xs_products (';
-                for($i = 0; $i < $size_fields; $i++) {
-                        $current_field = $fields[$i]['Field'];
-                        $sql_insert .= '`' . $current_field . '`';
-                        if($i < $size_fields - 1)
+                foreach($fields as $current_field) {
+                        $sql_insert .= '`' . $current_field['Field'] . '`';
+                        if($current_field['Field'] != $last_field)
                                 $sql_insert .= ', ';
                         else
                                 $sql_insert .= ' ) VALUES ( ';
                                 
                 }
-                for($i = 0; $i < $size_fields; $i++) {
-                        $current_field = $fields[$i]['Field'];
-                        $sql_insert .= '"' . $input[$current_field] . '"';
-                        if($i < $size_fields - 1)
+                
+                foreach($fields as $current_field) {
+                        $sql_insert .= '?';
+                        if($current_field['Field'] != $last_field)
                                 $sql_insert .= ', ';
                         else
                                 $sql_insert .= ' )';
                 }
-                $this->execute_query($sql_insert);
+                
+                foreach($fields as $current_field) {
+                        $type_array[] = $this->type2char($current_field['Type']);
+                        $value_array[] = $input[$current_field['Field']];
+                }
+                
+                $return = $this->multiple_bind($sql_insert, $type_array, $value_array);
+                if($return === TRUE)
+                        return TRUE;
         }
         
         function products_remove($input)
