@@ -29,6 +29,65 @@ class xs_products_database
                         $this->conn->query("CREATE TABLE xs_products ( `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, `name` VARCHAR(64) NOT NULL, `lang` VARCHAR(16) NOT NULL, title VARCHAR(64) NOT NULL, `img` VARCHAR(256), `descr` VARCHAR(1024));");
         }
         
+        function type2char($type)
+        {
+                if(strstr($type, 'char') !== FALSE || strstr($type, 'text') !== FALSE)
+                        return 's';
+                if(strstr($type, 'double') !== FALSE || strstr($type, 'float') !== FALSE || strstr($type, 'real') !== FALSE)
+                        return 'd';
+                if(strstr($type, 'int') !== FALSE)
+                        return 'i';
+                if(strstr($type, 'blob') !== FALSE)
+                        return 'b';
+                
+                return FALSE;
+        }
+        
+        
+        /* RESOURCE: https://www.pontikis.net/blog/dynamically-bind_param-array-mysqli */ 
+        function multiple_bind($sql, $a_param_type, $a_bind_params)
+        {
+                /* Bind parameters. Types: s = string, i = integer, d = double,  b = blob */
+                $a_params = array();
+                
+                $param_type = '';
+                $n = count($a_param_type);
+                for($i = 0; $i < $n; $i++) {
+                $param_type .= $a_param_type[$i];
+                }
+                
+                /* with call_user_func_array, array params must be passed by reference */
+                $a_params[] = & $param_type;
+                
+                for($i = 0; $i < $n; $i++) {
+                /* with call_user_func_array, array params must be passed by reference */
+                $a_params[] = & $a_bind_params[$i];
+                }
+                
+                /* Prepare statement */
+                $stmt = $this->conn->prepare($sql);
+                if($stmt === false) {
+                trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $this->conn->errno . ' ' . $this->conn->error, E_USER_ERROR);
+                }
+                
+                /* use call_user_func_array, as $stmt->bind_param('s', $param); does not accept params array */
+                call_user_func_array(array($stmt, 'bind_param'), $a_params);
+                
+                /* Execute statement */
+                $stmt->execute();
+                
+                /* Fetch result to array */
+                $res = $stmt->get_result();
+                if($res === FALSE) //if there aren't result
+                        return TRUE;
+                
+                while($row = $res->fetch_array(MYSQLI_ASSOC)) {
+                array_push($a_data, $row);
+                }
+                
+                return $a_data;
+        }
+        
         function execute_query($sql_query)
         {
                 $offset = $this->conn->query($sql_query);
@@ -182,9 +241,7 @@ class xs_products_database
         function products_update($input)
         {
                 $size_products = count($input);
-                
                 $fields = $this->fields_get();
-                $size_fields = count($fields);
                 
                 for($i = 0; $i < $size_products; $i++) {
                         $this->products_update_single($input[$i], $fields, $input[$i]['id']);
@@ -193,23 +250,33 @@ class xs_products_database
         
         function products_update_single($single, $fields, $id)
         {
+                $found = $this->products_get_id($single["name"], $single["lang"]); //find id this product from database
+                if( $id != $found  && $found > 0) { //if id is the same of product to override or is not found
+                        return FALSE;
+                }
+                        
                 $size_fields = count($fields);
+                $last_field = $fields[$size_fields - 1]['Field'];
                 
                 $sql_update = 'UPDATE xs_products SET ';
-                for($k = 0; $k < $size_fields; $k++) {
-                        $current_field = $fields[$k]['Field'];
-                        $sql_update .= '`' . $current_field . '` = "'. sanitize_text_field($single[$current_field]) . '"';
-                        if($k < $size_fields - 1) {
-                                $sql_update .= ', ';
+                
+                foreach($fields as $current_field) {
+                        $sql_update .= '`' . $current_field['Field'] . '`=?';
+                        if($current_field['Field'] != $last_field) { //if is not last element
+                                $sql_update .= ', '; //insert a comma
                         } else {
-                                $sql_update .= ' WHERE id = "' . $id . '";';
-                                $found = $this->products_get_id($single["name"], $single["lang"]);
-                                if( $id == $found  || $found < 0)
-                                        $this->execute_query($sql_update);
-                        $sql_update = 'UPDATE xs_products SET '; 
+                                $sql_update .= ' WHERE `id` = "' . $id . '";'; //add where clause
                         }
-                        
                 }
+                
+                foreach($fields as $current_field) {
+                        $type_array[] = $this->type2char($current_field['Type']);
+                        $value_array[] = $single[$current_field['Field']];
+                }
+                
+                $return = $this->multiple_bind($sql_update, $type_array, $value_array);
+                if($return === TRUE)
+                        return TRUE;
         }
         
         function products_add($input)
