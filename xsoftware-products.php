@@ -60,6 +60,7 @@ class xs_products_plugin
                         wp_die( __( 'Exit!' ) );
                 }
                 
+                
                 xs_framework::init_admin_style();
                 
                 echo '<div class="wrap">';
@@ -126,7 +127,6 @@ class xs_products_plugin
                 
                 echo '<tr><th>Field</th>';
                 echo '<th>Value</th></tr>';
-                
                 
                 for($i = 0; $i < $size_fields; $i++) {
                         echo '<tr>';
@@ -214,7 +214,8 @@ class xs_products_plugin
                 $this->fields = $this->db->fields_get();
                 $this->products = $this->db->products_get();
                 
-                wp_enqueue_style('products_style', plugins_url('style/admin.css', __FILE__));
+                xs_framework::init_admin_style();
+                
                 echo '<div class="wrap">';
 
                 echo '<h2>Products configuration</h2>';
