@@ -29,7 +29,7 @@ class xs_products_plugin
                 
                 add_action('admin_menu', array($this, 'admin_menu'));
                 add_action('admin_init', array($this, 'section_menu'));
-                $this->globals = get_option('product_global', $this->def_global);
+                $this->globals = get_option('globals', $this->def_global);
                 $this->db = new xs_products_database();
                 add_shortcode( 'xsoftware_dpc_products', array($this, 'dpc') );
                 
@@ -104,10 +104,10 @@ class xs_products_plugin
 
         function section_menu()
         {
-                register_setting( 'setting_globals', 'globals', array($this, 'input_global') );
+                register_setting( 'setting_globals', 'globals', array($this, 'input_globals') );
                 add_settings_section( 'section_globals', 'Global settings', array($this, 'show_globals'), 'globals' );
                 
-                register_setting( 'setting_field', 'fields', array($this, 'input_field') );
+                register_setting( 'setting_field', 'fields', array($this, 'input_fields') );
                 add_settings_section( 'section_field', 'List of fields', array($this, 'show_fields'), 'fields' );
 
                 register_setting( 'setting_product', 'products', array($this, 'input_products') );
@@ -115,13 +115,13 @@ class xs_products_plugin
         }
 
 
-        function input_global($input)
+        function input_globals($input)
         {
                 $input['template_file'] = sanitize_text_field( $input['template_file'] );
                 return $input;
         }
         
-        function input_field($input)
+        function input_fields($input)
         {
                 if(!empty($input['new']['Field']) && !empty($input['new']['Type'])) {
                         $this->db->field_add(sanitize_text_field($input['new']['Field']), sanitize_text_field($input['new']['Type']));
@@ -155,7 +155,13 @@ class xs_products_plugin
         
         function show_globals()
         {
-                echo "Template file path: <input type='text' name='globals[template_file]' value='".$this->globals["template_file"]."'>";
+                $settings_field = array('value' => $this->globals['template_file'], 'name' => 'globals[template_file]');
+                add_settings_field($settings_field['name'], 
+                'Template file path:',
+                'xs_framework::create_input',
+                'globals',
+                'section_globals',
+                $settings_field);
         }
         
         function show_fields()
