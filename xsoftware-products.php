@@ -133,8 +133,7 @@ class xs_products_plugin
                                 $data[$i][1] = xs_framework::create_textarea(array('class' => 'xs_full_width', 'text' => $single[$current_field], 'name' => 'product_value[0]['.$current_field.']', 'return' => true));
                 }
                 
-                $settings = array('class' => 'xs_full_width', 'headers' => $headers, 'data' => $data );
-                xs_framework::create_table($settings);
+                xs_framework::create_table(array('class' => 'xs_full_width', 'headers' => $headers, 'data' => $data ));
         }
         
         public function show_product_edit_all()
@@ -144,8 +143,7 @@ class xs_products_plugin
                 
                 for($i = 0; $i < count($products); $i++)
                 {
-                        $settings = array( 'name' => 'product_value[delete]', 'class' => 'button-primary', 'value' => $products[$i]['id'], 'text' => 'Remove', 'return' => true);
-                        $actions = xs_framework::create_button($settings);
+                        $actions = xs_framework::create_button(array( 'name' => 'product_value[delete]', 'class' => 'button-primary', 'value' => $products[$i]['id'], 'text' => 'Remove', 'return' => true));
                         array_unshift($products[$i], $actions);
                         foreach($fields as $current_field) {
                                 if($current_field == 'id')
@@ -160,35 +158,29 @@ class xs_products_plugin
                 
                 array_unshift($fields, "Actions");
                 
-                $settings = array('headers' => $fields, 'data' => $products );
-                xs_framework::create_table($settings);
+                xs_framework::create_table(array('headers' => $fields, 'data' => $products ));
         
         }
         
         public function show_product_edit_add()
         {
-                $fields = $this->db->fields_get();
+                $fields = $this->db->fields_get_name_skip(array('id'));
                 $size_fields = count($fields);
                 
-                echo '<tr><th>Field</th>';
-                echo '<th>Value</th></tr>';
+                $headers = array('Field', 'Value');
+                $data = array();
                 
-               for($i = 0; $i < $size_fields; $i++) {
-                        echo '<tr>';
-                        $current_field = $fields[$i]['Field'];
-                        echo "<td>".$current_field."</td>";
-                        if($current_field == "lang") {
-                                echo "<td style='width: 100%;'><select style='width: 100%;' name='product_value[new][lang]'>";
-                                xs_language::languages_options();
-                                echo "</select></td>";
-                        }
-                        else if($current_field == "id") {
-                                echo "<td></td>"; //Skip ID
-                        } else {
-                                echo "<td style='width: 100%;'><textarea style='width: 100%;' name='product_value[new][".$current_field."]' placeholder='Add ".$current_field."..'></textarea></td>";
-                        }
-                        echo '<tr>';
+                for($i = 0; $i < $size_fields; $i++ )
+                {
+                        $data[$i][0] = $current_field = $fields[$i];
+                        
+                        if($current_field == 'lang')
+                                $data[$i][1] = xs_framework::create_select(array('class' => 'xs_full_width', 'name' => 'product_value[new][lang]', 'data' => xs_language::$language_codes, 'reverse' => true, 'return' => true));
+                        else
+                                $data[$i][1] = xs_framework::create_textarea(array('class' => 'xs_full_width', 'name' => 'product_value[new]['.$current_field.']', 'return' => true));
                 }
+                
+                xs_framework::create_table(array('class' => 'xs_full_width', 'headers' => $headers, 'data' => $data ));
         }
 
         public function menu_page()
@@ -321,9 +313,7 @@ class xs_products_plugin
                         array_unshift($products[$i], $actions);
                 }
                 
-                $settings_field =  array("headers" => $fields_name, "data" => $products);
-                
-                xs_framework::create_table($settings_field);
+                xs_framework::create_table(array("headers" => $fields_name, "data" => $products));
         }
 
         /* Dynamic Page Content */
