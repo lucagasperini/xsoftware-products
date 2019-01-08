@@ -303,12 +303,9 @@ class xs_products_plugin
                 
                 $fields_name[] = "Actions";
                 foreach($fields as $single)
-                {
                         $fields_name[] = $single;
-                }
                 
-                for($i = 0; $i < count($products); $i++)
-                {
+                for($i = 0; $i < count($products); $i++) {
                         $actions = xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products_edit&id='.$products[$i]['id'], 'class' => 'button-primary', 'text' => 'Show', 'return' => true));
                         array_unshift($products[$i], $actions);
                 }
