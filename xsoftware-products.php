@@ -50,35 +50,90 @@ class xs_products_plugin
                         add_menu_page( 'XSoftware', 'XSoftware', 'manage_options', 'xsoftware', array($this, 'menu_page') );
                         
                 add_submenu_page( 'xsoftware', 'XSoftware Products','Products', 'manage_options', 'xsoftware_products', array($this, 'menu_page') );
-                
-                add_submenu_page( 'xsoftware', 'XSoftware Products', 'Edit products', 'manage_options', 'xsoftware_products_edit', array($this, 'menu_page_edit'));
         }
         
-        public function menu_page_edit()
+        
+        public function menu_page()
         {
                 if ( !current_user_can( 'manage_options' ) )  {
                         wp_die( __( 'Exit!' ) );
                 }
                 
+                $this->fields = $this->db->fields_get();
+                $this->products = $this->db->products_get();
                 
                 xs_framework::init_admin_style();
                 
                 echo '<div class="wrap">';
+
                 echo '<h2>Products configuration</h2>';
+                
+                // <GLOBAL>
+                echo '<form action="options.php" method="post">';
+
+                settings_fields('setting_globals');
+                do_settings_sections('globals');
+
+                submit_button( '', 'primary', 'field_update', true, NULL );
+                echo '</form>';
+                // </GLOBAL>
+                
+                // <FIELDS>
+                echo '<form action="options.php" method="post">';
+
+                settings_fields('setting_field');
+                do_settings_sections('fields');
+
+                submit_button( 'Update fields', 'primary', 'field_update', true, NULL );
+                echo '</form>';
+                // </FIELDS>
                 
                 echo "<form action=\"options.php\" method=\"post\">";
                 
-                settings_fields('setting_products_edit');
-                do_settings_sections('products_edit');
+                // <PRODUCTS>
+                settings_fields('setting_product');
+                do_settings_sections('products');
+                // </PRODUCTS>
                 
                 submit_button( 'Update products', 'primary', 'product_update', true, NULL );
                 
                 echo "</form>";
+                
                 echo '</div>';
         }
+
+        function section_menu()
+        {
+                register_setting( 'setting_globals', 'product_global', array($this, 'input_global') );
+                add_settings_section( 'section_globals', 'Global settings', array($this, 'show_globals'), 'globals' );
+                
+                register_setting( 'setting_field', 'product_field', array($this, 'input_field') );
+                add_settings_section( 'section_field', 'List of fields', array($this, 'show_fields'), 'fields' );
+
+                register_setting( 'setting_product', 'product_value', array($this, 'input_products') );
+                add_settings_section( 'section_products', 'List of products', array($this, 'show_products'), 'products' );
+        }
+
+
+        function input_global($input)
+        {
+                $input['template_file'] = sanitize_text_field( $input['template_file'] );
+                return $input;
+        }
         
+        function input_field($input)
+        {
+                if(!empty($input['new']['Field']) && !empty($input['new']['Type'])) {
+                        $this->db->field_add(sanitize_text_field($input['new']['Field']), sanitize_text_field($input['new']['Type']));
+                }
+                if(!empty($input['delete'])) {
+                        $this->db->field_remove(sanitize_text_field($input['delete']));
+                }
+                
+                unset($input);
+        }
         
-        public function input_products_edit($input)
+        public function input_products($input)
         {
                 if(isset($input['new'])) {
                         $add_product = $input['new']; // copy variable
@@ -98,18 +153,58 @@ class xs_products_plugin
                 unset($input); // clear memory
         }
         
-        public function show_products_edit()
+        function show_globals()
         {
-                if(isset($_GET["id"])) {
-                        if($_GET["id"] == "new") {
-                                $this->show_product_edit_add();
-                        } else {
-                                $products = $this->db->products_get(NULL, $_GET["id"]);
-                                if(isset($products[0]))
-                                        $this->show_product_edit_single($products[0]);
-                        }
-                } else {
+                echo "Template file path: <input type='text' name='product_global[template_file]' value='".$this->globals["template_file"]."'>";
+        }
+        
+        function show_fields()
+        {
+                $fields = $this->db->fields_get_skip(array('id', 'name', 'lang'));
+                
+                $headers = array('Actions', 'Name', 'Type');
+                $data = array();
+                
+                foreach($fields as $current_field) {
+                        $row[0] = xs_framework::create_button(array( 'name' => 'product_field[delete]', 'class' => 'button-primary', 'value' => $current_field['Field'], 'text' => 'Remove', 'return' => true));
+                        $row[1] = $current_field['Field'];
+                        $row[2] = $current_field['Type'];
+                        $data[] = $row;
+                }
+                
+                $new[0] = '';
+                $new[1] = xs_framework::create_input(array('name' => 'product_field[new][Field]', 'return' => true));
+                $new[2] = xs_framework::create_input(array('name' => 'product_field[new][Type]', 'return' => true));
+                
+                $data[] = $new;
+                
+                xs_framework::create_table(array('class' => 'xs_full_width', 'headers' => $headers, 'data' => $data));
+
+        }
+        
+        function show_products()
+        {
+                if(!isset($_GET["edit"])) {
+                        $this->show_products_all();
+                        return;
+                }
+                
+                $get = $_GET["edit"];
+                
+                if($get == "new") {
+                        $this->show_product_edit_add();
+                        return;
+                }
+                
+                if ($get == "all") {
                         $this->show_product_edit_all();
+                        return;
+                }
+                
+                $products = $this->db->products_get(NULL, $get);
+                if(isset($products[0])) {
+                        $this->show_product_edit_single($products[0]);
+                        return;
                 }
         }
         
@@ -183,115 +278,12 @@ class xs_products_plugin
                 xs_framework::create_table(array('class' => 'xs_full_width', 'headers' => $headers, 'data' => $data ));
         }
 
-        public function menu_page()
-        {
-                if ( !current_user_can( 'manage_options' ) )  {
-                        wp_die( __( 'Exit!' ) );
-                }
-                
-                $this->fields = $this->db->fields_get();
-                $this->products = $this->db->products_get();
-                
-                xs_framework::init_admin_style();
-                
-                echo '<div class="wrap">';
-
-                echo '<h2>Products configuration</h2>';
-                
-                // <GLOBAL>
-                echo '<form action="options.php" method="post">';
-
-                settings_fields('setting_globals');
-                do_settings_sections('globals');
-
-                submit_button( '', 'primary', 'field_update', true, NULL );
-                echo '</form>';
-                // </GLOBAL>
-                
-                // <FIELDS>
-                echo '<form action="options.php" method="post">';
-
-                settings_fields('setting_field');
-                do_settings_sections('fields');
-
-                submit_button( 'Update fields', 'primary', 'field_update', true, NULL );
-                echo '</form>';
-                // </FIELDS>
-                
-                // <PRODUCTS>
-                settings_fields('setting_product');
-                do_settings_sections('products');
-                // </PRODUCTS>
-                
-                echo '</div>';
-        }
-
-        function section_menu()
-        {
-                register_setting( 'setting_globals', 'product_global', array($this, 'input_global') );
-                add_settings_section( 'section_globals', 'Global settings', array($this, 'show_globals'), 'globals' );
-                
-                register_setting( 'setting_field', 'product_field', array($this, 'input_field') );
-                add_settings_section( 'section_field', 'List of fields', array($this, 'show_fields'), 'fields' );
-
-                add_settings_section( 'section_products', 'List of products', array($this, 'show_products'), 'products' );
-                
-                register_setting( 'setting_products_edit', 'product_value', array($this, 'input_products_edit') );
-                add_settings_section( 'section_products_edit', 'List of products', array($this, 'show_products_edit'), 'products_edit' );
-        }
-
-
-        function input_global($input)
-        {
-                $input['template_file'] = sanitize_text_field( $input['template_file'] );
-                return $input;
-        }
         
-        function input_field($input)
+        function show_products_all()
         {
-                if(!empty($input['new']['Field']) && !empty($input['new']['Type'])) {
-                        $this->db->field_add(sanitize_text_field($input['new']['Field']), sanitize_text_field($input['new']['Type']));
-                }
-                if(!empty($input['delete'])) {
-                        $this->db->field_remove(sanitize_text_field($input['delete']));
-                }
+                xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products&edit=new', 'class' => 'button-primary', 'text' => 'Add a product'));
+                xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products&edit=all', 'class' => 'button-primary', 'text' => 'Edit all products'));
                 
-                unset($input);
-        }
-        
-        function show_globals()
-        {
-                echo "Template file path: <input type='text' name='product_global[template_file]' value='".$this->globals["template_file"]."'>";
-        }
-        
-        function show_fields()
-        {
-                $fields = $this->db->fields_get_skip(array('id', 'name', 'lang'));
-                
-                $headers = array('Actions', 'Name', 'Type');
-                $data = array();
-                
-                foreach($fields as $current_field) {
-                        $row[0] = xs_framework::create_button(array( 'name' => 'product_field[delete]', 'class' => 'button-primary', 'value' => $current_field['Field'], 'text' => 'Remove', 'return' => true));
-                        $row[1] = $current_field['Field'];
-                        $row[2] = $current_field['Type'];
-                        $data[] = $row;
-                }
-                
-                $new[0] = '';
-                $new[1] = xs_framework::create_input(array('name' => 'product_field[new][Field]', 'return' => true));
-                $new[2] = xs_framework::create_input(array('name' => 'product_field[new][Type]', 'return' => true));
-                
-                $data[] = $new;
-                
-                xs_framework::create_table(array('class' => 'xs_full_width', 'headers' => $headers, 'data' => $data));
-
-        }
-        
-        function show_products()
-        {
-                xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products_edit&id=new', 'class' => 'button-primary', 'text' => 'Add a product'));
-
                 $fields = $this->db->fields_get_name();
                 $products = $this->db->products_get();
                 
@@ -300,7 +292,7 @@ class xs_products_plugin
                         $fields_name[] = $single;
                 
                 for($i = 0; $i < count($products); $i++) {
-                        $actions = xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products_edit&id='.$products[$i]['id'], 'class' => 'button-primary', 'text' => 'Show', 'return' => true));
+                        $actions = xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products&edit='.$products[$i]['id'], 'class' => 'button-primary', 'text' => 'Show', 'return' => true));
                         array_unshift($products[$i], $actions);
                 }
                 
