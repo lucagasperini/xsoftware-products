@@ -267,30 +267,24 @@ class xs_products_plugin
         function show_fields()
         {
                 $fields = $this->db->fields_get_skip(array('id', 'name', 'lang'));
-                $size_fields = count($fields);
-        ?>
-                <table id='product_admin_tbl'>
-                <tr>
-                <th>Actions</th>
-                <th>Name</th>
-                <th>Type</th>
-                </tr>
-        <?php
-                for($i = 0; $i < $size_fields; $i++) {
-                echo '<tr>
-                <td><button class="button-primary" name="product_field[delete]" value="'.$fields[$i]['Field'].'">Remove</button></td>
-                <td>'.$fields[$i]['Field'].'</td>
-                <td>'.$fields[$i]['Type'].'</td>
-                </tr>';
+                
+                $headers = array('Actions', 'Name', 'Type');
+                $data = array();
+                
+                foreach($fields as $current_field) {
+                        $row[0] = xs_framework::create_button(array( 'name' => 'product_field[delete]', 'class' => 'button-primary', 'value' => $current_field['Field'], 'text' => 'Remove', 'return' => true));
+                        $row[1] = $current_field['Field'];
+                        $row[2] = $current_field['Type'];
+                        $data[] = $row;
                 }
-
-
-                echo "<tr>
-                <td></td>
-                <td><input type='text' name='product_field[new][Field]' placeholder='Add Name..'></td>
-                <td><input type='text' name='product_field[new][Type]' placeholder='Add Type..'></td>
-                </tr>
-                </table>";
+                
+                $new[0] = '';
+                $new[1] = xs_framework::create_input(array('name' => 'product_field[new][Field]', 'return' => true));
+                $new[2] = xs_framework::create_input(array('name' => 'product_field[new][Type]', 'return' => true));
+                
+                $data[] = $new;
+                
+                xs_framework::create_table(array('class' => 'xs_full_width', 'headers' => $headers, 'data' => $data));
 
         }
         
@@ -310,7 +304,7 @@ class xs_products_plugin
                         array_unshift($products[$i], $actions);
                 }
                 
-                xs_framework::create_table(array("headers" => $fields_name, "data" => $products));
+                xs_framework::create_table(array('headers' => $fields_name, 'data' => $products));
         }
 
         /* Dynamic Page Content */
