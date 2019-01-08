@@ -100,8 +100,6 @@ class xs_products_plugin
         
         public function show_products_edit()
         {
-                echo '<table class="product_admin_tbl">';
-                
                 if(isset($_GET["id"])) {
                         if($_GET["id"] == "new") {
                                 $this->show_product_edit_add();
@@ -113,38 +111,30 @@ class xs_products_plugin
                 } else {
                         $this->show_product_edit_all();
                 }
-                
-                echo "</table>";
-                        
-                
         }
         
         public function show_product_edit_single($single)
         {
-                $fields = $this->db->fields_get();
+                $fields = $this->db->fields_get_name();
                 $size_fields = count($fields);
-                $id_product = $single['id'];
                 
-                echo '<tr><th>Field</th>';
-                echo '<th>Value</th></tr>';
+                $headers = array('Field', 'Value');
+                $data = array();
                 
-                for($i = 0; $i < $size_fields; $i++) {
-                        echo '<tr>';
-                        $current_field = $fields[$i]['Field'];
-                        echo "<td>".$current_field."</td>";
-                        if ($current_field == "lang") {
-                                echo "<td style='width: 100%;'><select style='width: 100%;' name='product_value[0][lang]'>";
-                                xs_language::languages_options($single['lang']);
-                                echo "</select></td>";
-                        }
-                        else if($current_field == "id") {
-                                echo "<td style='width: 100%;'><input style='width: 100%;' type='text' name='product_value[0][".$current_field."]' value='".$single[$current_field]."' readonly></td>";
-                        }
-                        else {
-                                echo "<td style='width: 100%;'><textarea style='width: 100%;' name='product_value[0][".$current_field."]'>".$single[$current_field]."</textarea></td>";
-                        }
-                echo "</tr>";
+                for($i = 0; $i < $size_fields; $i++ )
+                {
+                        $data[$i][0] = $current_field = $fields[$i];
+                        
+                        if($current_field == 'id')
+                                $data[$i][1] = xs_framework::create_input(array('class' => 'xs_full_width', 'value' => $single['id'], 'name' => 'product_value[0][id]', 'readonly' => true, 'type' => 'text', 'return' => true));
+                        else if($current_field == 'lang')
+                                $data[$i][1] = xs_framework::create_select(array('class' => 'xs_full_width', 'name' => 'product_value[0][lang]', 'data' => xs_language::$language_codes, 'selected' => $single['lang'], 'reverse' => true, 'return' => true));
+                        else
+                                $data[$i][1] = xs_framework::create_textarea(array('class' => 'xs_full_width', 'text' => $single[$current_field], 'name' => 'product_value[0]['.$current_field.']', 'return' => true));
                 }
+                
+                $settings = array('class' => 'xs_full_width', 'headers' => $headers, 'data' => $data );
+                xs_framework::create_table($settings);
         }
         
         public function show_product_edit_all()
