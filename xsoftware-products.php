@@ -210,6 +210,8 @@ class xs_products_plugin
         
         public function show_product_edit_single($single)
         {
+                xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products', 'class' => 'button-primary', 'text' => 'Back'));
+                
                 $fields = $this->db->fields_get_name();
                 $size_fields = count($fields);
                 
@@ -233,6 +235,8 @@ class xs_products_plugin
         
         public function show_product_edit_all()
         {
+                xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products', 'class' => 'button-primary', 'text' => 'Back'));
+                
                 $products = $this->db->products_get();
                 $fields = $this->db->fields_get_name();
                 
@@ -259,6 +263,8 @@ class xs_products_plugin
         
         public function show_product_edit_add()
         {
+                xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products', 'class' => 'button-primary', 'text' => 'Back'));
+                
                 $fields = $this->db->fields_get_name_skip(array('id'));
                 $size_fields = count($fields);
                 
