@@ -63,6 +63,7 @@ class xs_products_plugin
                 $this->products = $this->db->products_get();
                 
                 xs_framework::init_admin_style();
+                wp_enqueue_script('xsoftware_products_functions', plugins_url('js/functions.js', __FILE__));
                 
                 echo '<div class="wrap">';
 
@@ -248,7 +249,8 @@ class xs_products_plugin
                 
                 for($i = 0; $i < count($products); $i++)
                 {
-                        $actions = xs_framework::create_button(array( 'name' => 'products[delete]', 'class' => 'button-primary', 'value' => $products[$i]['id'], 'text' => 'Remove', 'return' => true));
+                        $actions = xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products&edit='.$products[$i]['id'], 'class' => 'button-primary xs_full_width xs_text_center', 'text' => 'Show', 'return' => true));
+                        $actions .= xs_framework::create_button(array( 'name' => 'products[delete]', 'class' => 'button-primary xs_full_width', 'value' => $products[$i]['id'], 'text' => 'Remove', 'onclick'=>'return confirm_box()', 'return' => true));
                         array_unshift($products[$i], $actions);
                         foreach($fields as $current_field) {
                                 if($current_field == 'id')
@@ -304,7 +306,8 @@ class xs_products_plugin
                         $fields_name[] = $single;
                 
                 for($i = 0; $i < count($products); $i++) {
-                        $actions = xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products&edit='.$products[$i]['id'], 'class' => 'button-primary', 'text' => 'Show', 'return' => true));
+                        $actions = xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products&edit='.$products[$i]['id'], 'class' => 'button-primary xs_full_width xs_text_center', 'text' => 'Show', 'return' => true));
+                        $actions .= xs_framework::create_button(array( 'name' => 'products[delete]', 'class' => 'button-primary xs_full_width', 'value' => $products[$i]['id'], 'text' => 'Remove', 'onclick'=>'return confirm_box()', 'return' => true));
                         array_unshift($products[$i], $actions);
                 }
                 
