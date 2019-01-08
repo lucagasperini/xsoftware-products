@@ -296,20 +296,20 @@ class xs_products_plugin
         
         function show_products()
         {
-                echo "<a class=\"button-primary\" href=\"admin.php?page=xsoftware_products_edit&id=new\">Add a product</a>";
+                xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products_edit&id=new', 'class' => 'button-primary', 'text' => 'Add a product'));
 
-                $fields = $this->db->fields_get();
+                $fields = $this->db->fields_get_name();
                 $products = $this->db->products_get();
                 
                 $fields_name[] = "Actions";
                 foreach($fields as $single)
                 {
-                        $fields_name[] = $single["Field"];
+                        $fields_name[] = $single;
                 }
                 
                 for($i = 0; $i < count($products); $i++)
                 {
-                        $actions = "<a class=\"button-primary\" href=\"admin.php?page=xsoftware_products_edit&id=".$products[$i]['id']."\">Show</a>";
+                        $actions = xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products_edit&id='.$products[$i]['id'], 'class' => 'button-primary', 'text' => 'Show', 'return' => true));
                         array_unshift($products[$i], $actions);
                 }
                 
