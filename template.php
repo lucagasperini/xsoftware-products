@@ -16,5 +16,6 @@ function products_single($product)
         echo '<div class="product_content">';
         echo '<img class="product_img" src="'.$product['img'].'"/>';
         echo '<p class="product_descr">'.$product['descr'].'</p>';
+        echo '</div>';
 }
 ?>
