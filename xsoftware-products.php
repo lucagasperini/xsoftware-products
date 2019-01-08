@@ -104,13 +104,13 @@ class xs_products_plugin
 
         function section_menu()
         {
-                register_setting( 'setting_globals', 'product_global', array($this, 'input_global') );
+                register_setting( 'setting_globals', 'globals', array($this, 'input_global') );
                 add_settings_section( 'section_globals', 'Global settings', array($this, 'show_globals'), 'globals' );
                 
-                register_setting( 'setting_field', 'product_field', array($this, 'input_field') );
+                register_setting( 'setting_field', 'fields', array($this, 'input_field') );
                 add_settings_section( 'section_field', 'List of fields', array($this, 'show_fields'), 'fields' );
 
-                register_setting( 'setting_product', 'product_value', array($this, 'input_products') );
+                register_setting( 'setting_product', 'products', array($this, 'input_products') );
                 add_settings_section( 'section_products', 'List of products', array($this, 'show_products'), 'products' );
         }
 
@@ -155,7 +155,7 @@ class xs_products_plugin
         
         function show_globals()
         {
-                echo "Template file path: <input type='text' name='product_global[template_file]' value='".$this->globals["template_file"]."'>";
+                echo "Template file path: <input type='text' name='globals[template_file]' value='".$this->globals["template_file"]."'>";
         }
         
         function show_fields()
@@ -166,15 +166,15 @@ class xs_products_plugin
                 $data = array();
                 
                 foreach($fields as $current_field) {
-                        $row[0] = xs_framework::create_button(array( 'name' => 'product_field[delete]', 'class' => 'button-primary', 'value' => $current_field['Field'], 'text' => 'Remove', 'return' => true));
+                        $row[0] = xs_framework::create_button(array( 'name' => 'fields[delete]', 'class' => 'button-primary', 'value' => $current_field['Field'], 'text' => 'Remove', 'return' => true));
                         $row[1] = $current_field['Field'];
                         $row[2] = $current_field['Type'];
                         $data[] = $row;
                 }
                 
                 $new[0] = '';
-                $new[1] = xs_framework::create_input(array('name' => 'product_field[new][Field]', 'return' => true));
-                $new[2] = xs_framework::create_input(array('name' => 'product_field[new][Type]', 'return' => true));
+                $new[1] = xs_framework::create_input(array('name' => 'fields[new][Field]', 'return' => true));
+                $new[2] = xs_framework::create_input(array('name' => 'fields[new][Type]', 'return' => true));
                 
                 $data[] = $new;
                 
@@ -223,11 +223,11 @@ class xs_products_plugin
                         $data[$i][0] = $current_field = $fields[$i];
                         
                         if($current_field == 'id')
-                                $data[$i][1] = xs_framework::create_input(array('class' => 'xs_full_width', 'value' => $single['id'], 'name' => 'product_value[0][id]', 'readonly' => true, 'type' => 'text', 'return' => true));
+                                $data[$i][1] = xs_framework::create_input(array('class' => 'xs_full_width', 'value' => $single['id'], 'name' => 'products[0][id]', 'readonly' => true, 'type' => 'text', 'return' => true));
                         else if($current_field == 'lang')
-                                $data[$i][1] = xs_framework::create_select(array('class' => 'xs_full_width', 'name' => 'product_value[0][lang]', 'data' => xs_language::$language_codes, 'selected' => $single['lang'], 'reverse' => true, 'return' => true));
+                                $data[$i][1] = xs_framework::create_select(array('class' => 'xs_full_width', 'name' => 'products[0][lang]', 'data' => xs_language::$language_codes, 'selected' => $single['lang'], 'reverse' => true, 'return' => true));
                         else
-                                $data[$i][1] = xs_framework::create_textarea(array('class' => 'xs_full_width', 'text' => $single[$current_field], 'name' => 'product_value[0]['.$current_field.']', 'return' => true));
+                                $data[$i][1] = xs_framework::create_textarea(array('class' => 'xs_full_width', 'text' => $single[$current_field], 'name' => 'products[0]['.$current_field.']', 'return' => true));
                 }
                 
                 xs_framework::create_table(array('class' => 'xs_full_width', 'headers' => $headers, 'data' => $data ));
@@ -242,15 +242,15 @@ class xs_products_plugin
                 
                 for($i = 0; $i < count($products); $i++)
                 {
-                        $actions = xs_framework::create_button(array( 'name' => 'product_value[delete]', 'class' => 'button-primary', 'value' => $products[$i]['id'], 'text' => 'Remove', 'return' => true));
+                        $actions = xs_framework::create_button(array( 'name' => 'products[delete]', 'class' => 'button-primary', 'value' => $products[$i]['id'], 'text' => 'Remove', 'return' => true));
                         array_unshift($products[$i], $actions);
                         foreach($fields as $current_field) {
                                 if($current_field == 'id')
-                                        $products[$i]['id'] = xs_framework::create_input(array('value' => $products[$i]['id'], 'name' => 'product_value['.$i.'][id]', 'readonly' => true, 'type' => 'text', 'return' => true));
+                                        $products[$i]['id'] = xs_framework::create_input(array('value' => $products[$i]['id'], 'name' => 'products['.$i.'][id]', 'readonly' => true, 'type' => 'text', 'return' => true));
                                 else if($current_field == 'lang')
-                                        $products[$i]['lang'] = xs_framework::create_select(array( 'name' => 'product_value['.$i.'][lang]', 'data' => xs_language::$language_codes, 'selected' => $products[$i]['lang'], 'reverse' => true, 'return' => true));
+                                        $products[$i]['lang'] = xs_framework::create_select(array( 'name' => 'products['.$i.'][lang]', 'data' => xs_language::$language_codes, 'selected' => $products[$i]['lang'], 'reverse' => true, 'return' => true));
                                 else
-                                        $products[$i][$current_field] = xs_framework::create_textarea(array('text' => $products[$i][$current_field], 'name' => 'product_value['.$i.']['.$current_field.']', 'return' => true));
+                                        $products[$i][$current_field] = xs_framework::create_textarea(array('text' => $products[$i][$current_field], 'name' => 'products['.$i.']['.$current_field.']', 'return' => true));
                         }
                         
                 }
@@ -276,9 +276,9 @@ class xs_products_plugin
                         $data[$i][0] = $current_field = $fields[$i];
                         
                         if($current_field == 'lang')
-                                $data[$i][1] = xs_framework::create_select(array('class' => 'xs_full_width', 'name' => 'product_value[new][lang]', 'data' => xs_language::$language_codes, 'reverse' => true, 'return' => true));
+                                $data[$i][1] = xs_framework::create_select(array('class' => 'xs_full_width', 'name' => 'products[new][lang]', 'data' => xs_language::$language_codes, 'reverse' => true, 'return' => true));
                         else
-                                $data[$i][1] = xs_framework::create_textarea(array('class' => 'xs_full_width', 'name' => 'product_value[new]['.$current_field.']', 'return' => true));
+                                $data[$i][1] = xs_framework::create_textarea(array('class' => 'xs_full_width', 'name' => 'products[new]['.$current_field.']', 'return' => true));
                 }
                 
                 xs_framework::create_table(array('class' => 'xs_full_width', 'headers' => $headers, 'data' => $data ));
