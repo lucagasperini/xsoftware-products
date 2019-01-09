@@ -19,8 +19,7 @@ class xs_products_database
                 if (mysqli_connect_error()) {
                         die("Connection to database failed: " . mysqli_connect_error());
                 }
-                if(is_resource($this->conn)) 
-                { 
+                if(is_resource($this->conn)) { 
                         $this->conn->query($this->conn, "SET NAMES 'utf8'"); 
                         $this->conn->query($this->conn, "SET CHARACTER SET 'utf8'"); 
                 } 
