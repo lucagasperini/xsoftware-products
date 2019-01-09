@@ -29,7 +29,7 @@ class xs_products_plugin
                 
                 add_action('admin_menu', array($this, 'admin_menu'));
                 add_action('admin_init', array($this, 'section_menu'));
-                $this->globals = get_option('globals', $this->def_global);
+                $this->globals = get_option('xs_products_globals', $this->def_global);
                 $this->db = new xs_products_database();
                 add_shortcode( 'xsoftware_dpc_products', array($this, 'dpc') );
                 
@@ -105,7 +105,7 @@ class xs_products_plugin
 
         function section_menu()
         {
-                register_setting( 'setting_globals', 'globals', array($this, 'input_globals') );
+                register_setting( 'setting_globals', 'xs_products_globals', array($this, 'input_globals') );
                 add_settings_section( 'section_globals', 'Global settings', array($this, 'show_globals'), 'globals' );
                 
                 register_setting( 'setting_field', 'fields', array($this, 'input_fields') );
@@ -156,7 +156,7 @@ class xs_products_plugin
         
         function show_globals()
         {
-                $settings_field = array('value' => $this->globals['template_file'], 'name' => 'globals[template_file]');
+                $settings_field = array('value' => $this->globals['template_file'], 'name' => 'xs_products_globals[template_file]');
                 add_settings_field($settings_field['name'], 
                 'Template file path:',
                 'xs_framework::create_input',
