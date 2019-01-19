@@ -25,7 +25,14 @@ class xs_products_database
                 } 
                 $result = $this->conn->query("SELECT 1 FROM `xs_products` LIMIT 1");
                 if($result === FALSE)
-                        $this->conn->query("CREATE TABLE xs_products ( `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, `name` VARCHAR(64) NOT NULL, `lang` VARCHAR(16) NOT NULL, title VARCHAR(64) NOT NULL, `img` VARCHAR(256), `descr` VARCHAR(1024));");
+                        $this->conn->query("CREATE TABLE xs_products ( 
+                        `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+                        `name` VARCHAR(64) NOT NULL, 
+                        `lang` VARCHAR(16) NOT NULL, 
+                        `title` VARCHAR(64) NOT NULL, 
+                        `img` VARCHAR(256), 
+                        `descr` VARCHAR(1024)
+                        );");
         }
         
         function type2char($type)

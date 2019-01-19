@@ -1,0 +1,155 @@
+XSoftware WordPress Products
+============================
+Database
+--------
+
+La gestione del database è definita nel file ``database.php``, quindi tutto il seguente articolo tratterà di tale file e della sua corrispondente classe ``xs_products_database``, tutto l'interfaccia col database è scritta in ``MYSQL``.
+
+Il database utilizzato per la gestione dei dati dei prodotti di default è il database di WordPress, è comunque possibile utilizzarne un altro se viene modificata la funzione ``init_db`` come di seguito:
+
+.. code-block:: php
+
+    function init_db()
+        {
+                if(isset($this->conn))
+                        return;
+                
+                $this->conn = new mysqli("xsoftware.it", "user", "strong_password", "products_db");
+                
+                if (mysqli_connect_error()) {
+                        die("Connection to database failed: " . mysqli_connect_error());
+                }
+                ...
+        }
+
+La funzione ``init_db`` è utilizzata ogni volta che si crea la classe, infatti è presente nella funzione ``__construct``, quindi il costruttore della classe, questa verifica che la connessione al database non è inizializzata, quindi la inizializza e verifica la presenza della tabella nel database ``xs_products``, se esiste già, non fa altro, altrimenti viene creata con il seguente codice sql:
+
+.. code-block:: sql
+
+    CREATE TABLE xs_products ( 
+                        `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+                        `name` VARCHAR(64) NOT NULL, 
+                        `lang` VARCHAR(16) NOT NULL, 
+                        `title` VARCHAR(64) NOT NULL, 
+                        `img` VARCHAR(256), 
+                        `descr` VARCHAR(1024)
+                        );
+
+Per permettere la dinamicità del software, è necessario generare campi diversi da quelli di default, così è possibile richiamare le funzioni per l'aggiunta o la rimozione di alcuni campi tramite ``field_add`` e ``field_remove``.
+
+.. code-block:: php
+
+        function field_add($name, $type)
+        {
+                $sql_query = 'ALTER TABLE xs_products ADD `' . $name . '` '. $type;
+                $this->execute_query($sql_query);
+        }
+
+La funzione ``field_add`` prende come parametri il nome del nuovo campo e il tipo di campo da generare, sono permessi tutti i tipi presenti in ``MYSQL``.
+
+.. code-block:: php
+
+        function field_remove($name)
+        {
+                $sql_query = 'ALTER TABLE xs_products DROP `' . $name . '`';
+                $this->execute_query($sql_query);
+        }
+
+La funzione ``field_remove`` prende come parametro il nome del nuovo campo, ma attenzione questo cancellerà tutti i dati presenti nel campo selezionato.
+
+Sono presenti inoltre 4 funzioni per la ricezione dei campi presenti nella tabella, queste funzioni sfruttano il seguente comando ``MYSQL`` e spiegato al seguente link: https://dev.mysql.com/doc/refman/5.7/en/show-columns.html
+
+.. code-block:: sql
+
+    SHOW COLUMNS FROM xs_products
+
+Di seguito sono spiegate le funzioni:
+
+.. code-block:: php
+
+        function fields_get()
+        {
+                $offset = array();
+                $result = $this->execute_query("SHOW COLUMNS FROM xs_products");
+                if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                                $offset[] = $row;
+                        }
+                }
+                return $offset;
+        }
+
+La funzione ``fields_get`` prende tutti i campi presenti nel database e li immagazzina nell'array ``$offset``.
+
+.. code-block:: php
+
+        function fields_get_name()
+        {
+                $offset = array();
+                $result = $this->execute_query("SHOW COLUMNS FROM xs_products");
+                if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                                $offset[] = $row['Field'];
+                        }
+                }
+                return $offset;
+        }
+
+La funzione ``fields_get_name`` prende tutti i nomi dei campi presenti nel database e li immagazzina nell'array ``$offset``.
+
+.. code-block:: php
+
+        function fields_get_skip($array)
+        {
+                $offset = array();
+                $result = $this->execute_query("SHOW COLUMNS FROM xs_products");
+                if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                                if(!in_array($row['Field'], $array))
+                                        $offset[] = $row;
+                        }
+                }
+                return $offset;
+        }
+
+La funzione ``fields_get_skip`` prende i campi presenti nel database ad esclusione dei quelli che sono presenti dell'array che viene passato come parametro e li immagazzina nell'array ``$offset``.
+
+
+.. code-block:: php
+
+        function fields_get_name_skip($array)
+        {
+                $offset = array();
+                $result = $this->execute_query("SHOW COLUMNS FROM xs_products");
+                if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                                if(!in_array($row['Field'], $array))
+                                        $offset[] = $row['Field'];
+                        }
+                }
+                return $offset;
+        }
+
+La funzione ``fields_get_name_skip`` prende i nomi dei campi presenti nel database ad esclusione dei quelli che sono presenti dell'array che viene passato come parametro e li immagazzina nell'array ``$offset``.
+
+È infine possibile ottenere il numero di campi tramite la funzione ``fields_count``:
+
+.. code-block:: php
+
+        function fields_count()
+        {
+                $result = $this->execute_query("SHOW COLUMNS FROM xs_products");
+                return $result->num_rows;
+        }
+
+Sono presenti anche le fuzioni per la gestione dei valori del database, anche essi sono dinamici, infatti le query sql sono generate per il numero di campi che il database possiede:
+
+La funzione ``products_add`` permette di aggiungere un record con i valori presenti nell'array di input, che devono chiamarsi come il nome dei campi del database.
+
+La funzione ``products_remove`` permette di rimuovere il record che abbia come ``id`` quello presente nel parametro di input.
+
+La funzione ``products_count`` permette di ottenere il numero di record presenti nella tabella.
+
+La funzione ``products_update`` permette di aggiornare una serie di record già esistenti con i valori presenti nell'array di input
+
+La funzione ``products_update_single`` permette di aggiornare un record già esistente con i valori di input presenti nell'array ``$single`` e solo per i campi col nome che sia presente nell'array ``$fields`` e con l'id definito in ``$id``
