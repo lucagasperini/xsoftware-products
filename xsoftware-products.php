@@ -156,7 +156,7 @@ class xs_products_plugin
         
         function show_fields()
         {
-                $fields = $this->db->fields_get_skip(array('id', 'name', 'lang'));
+                $fields = $this->db->fields_get_skip(array('id', 'name', 'lang', 'title'));
                 
                 $headers = array('Actions', 'Name', 'Type');
                 $data = array();
