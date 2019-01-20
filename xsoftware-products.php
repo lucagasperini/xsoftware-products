@@ -38,17 +38,6 @@ class xs_products_plugin
 
         function admin_menu()
         {
-                global $menu;
-                $menuExist = false;
-                foreach($menu as $item) {
-                        if(strtolower($item[0]) == strtolower('XSoftware')) {
-                                $menuExist = true;
-                        }
-                }
-                
-                if(!$menuExist)
-                        add_menu_page( 'XSoftware', 'XSoftware', 'manage_options', 'xsoftware', array($this, 'menu_page') );
-                        
                 add_submenu_page( 'xsoftware', 'XSoftware Products','Products', 'manage_options', 'xsoftware_products', array($this, 'menu_page') );
         }
         
