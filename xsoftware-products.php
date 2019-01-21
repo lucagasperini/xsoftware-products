@@ -10,7 +10,6 @@ Text Domain: xsoftware_products
 if(!defined('ABSPATH')) exit;
 
 include "database.php";
-include 'languages.php';
 
 class xs_products_plugin
 {
