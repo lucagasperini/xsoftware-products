@@ -209,6 +209,8 @@ class xs_products_plugin
                 $fields = $this->db->fields_get_name();
                 $size_fields = count($fields);
                 
+                $langs = xs_framework::get_option('available_languages');
+                
                 $headers = array('Field', 'Value');
                 $data = array();
                 
@@ -217,11 +219,29 @@ class xs_products_plugin
                         $data[$i][0] = $current_field = $fields[$i];
                         
                         if($current_field == 'id')
-                                $data[$i][1] = xs_framework::create_input(array('class' => 'xs_full_width', 'value' => $single['id'], 'name' => 'products[0][id]', 'readonly' => true, 'type' => 'text', 'return' => true));
+                                $data[$i][1] = xs_framework::create_input( array(
+                                        'class' => 'xs_full_width', 
+                                        'value' => $single['id'], 
+                                        'name' => 'products[0][id]', 
+                                        'readonly' => true, 
+                                        'type' => 'text', 
+                                        'return' => true
+                                ));
                         else if($current_field == 'lang')
-                                $data[$i][1] = xs_framework::create_select(array('class' => 'xs_full_width', 'name' => 'products[0][lang]', 'data' => xs_language::$language_codes, 'selected' => $single['lang'], 'reverse' => true, 'return' => true));
+                                $data[$i][1] = xs_framework::create_select( array(
+                                        'class' => 'xs_full_width', 
+                                        'name' => 'products[0][lang]', 
+                                        'data' => $langs, 
+                                        'selected' => $single['lang'],
+                                        'return' => true
+                                ));
                         else
-                                $data[$i][1] = xs_framework::create_textarea(array('class' => 'xs_full_width', 'text' => $single[$current_field], 'name' => 'products[0]['.$current_field.']', 'return' => true));
+                                $data[$i][1] = xs_framework::create_textarea( array(
+                                        'class' => 'xs_full_width', 
+                                        'text' => $single[$current_field], 
+                                        'name' => 'products[0]['.$current_field.']', 
+                                        'return' => true
+                                ));
                 }
                 
                 xs_framework::create_table(array('class' => 'xs_full_width', 'headers' => $headers, 'data' => $data ));
@@ -229,23 +249,56 @@ class xs_products_plugin
         
         public function show_product_edit_all()
         {
-                xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products', 'class' => 'button-primary', 'text' => 'Back'));
+                xs_framework::create_link( array(
+                        'href' => 'admin.php?page=xsoftware_products', 
+                        'class' => 'button-primary', 
+                        'text' => 'Back'
+                ));
                 
                 $products = $this->db->products_get();
                 $fields = $this->db->fields_get_name();
                 
+                $langs = xs_framework::get_option('available_languages');
+                
                 for($i = 0; $i < count($products); $i++)
                 {
-                        $actions = xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products&edit='.$products[$i]['id'], 'class' => 'button-primary xs_full_width xs_text_center', 'text' => 'Show', 'return' => true));
-                        $actions .= xs_framework::create_button(array( 'name' => 'products[delete]', 'class' => 'button-primary xs_full_width', 'value' => $products[$i]['id'], 'text' => 'Remove', 'onclick'=>'return confirm_box()', 'return' => true));
+                        $actions = xs_framework::create_link( array(
+                                'href' => 'admin.php?page=xsoftware_products&edit='.$products[$i]['id'], 
+                                'class' => 'button-primary xs_full_width xs_text_center', 
+                                'text' => 'Show', 
+                                'return' => true
+                        ));
+                        $actions .= xs_framework::create_button( array( 
+                                'name' => 'products[delete]', 
+                                'class' => 'button-primary xs_full_width', 
+                                'value' => $products[$i]['id'], 
+                                'text' => 'Remove', 
+                                'onclick'=>'return confirm_box()', 
+                                'return' => true
+                        ));
                         array_unshift($products[$i], $actions);
                         foreach($fields as $current_field) {
                                 if($current_field == 'id')
-                                        $products[$i]['id'] = xs_framework::create_input(array('value' => $products[$i]['id'], 'name' => 'products['.$i.'][id]', 'readonly' => true, 'type' => 'text', 'return' => true));
+                                        $products[$i]['id'] = xs_framework::create_input( array(
+                                                'value' => $products[$i]['id'], 
+                                                'name' => 'products['.$i.'][id]', 
+                                                'readonly' => true, 
+                                                'type' => 'text', 
+                                                'return' => true
+                                        ));
                                 else if($current_field == 'lang')
-                                        $products[$i]['lang'] = xs_framework::create_select(array( 'name' => 'products['.$i.'][lang]', 'data' => xs_language::$language_codes, 'selected' => $products[$i]['lang'], 'reverse' => true, 'return' => true));
+                                        $products[$i]['lang'] = xs_framework::create_select( array( 
+                                                'name' => 'products['.$i.'][lang]', 
+                                                'data' => $langs, 
+                                                'selected' => $products[$i]['lang'],
+                                                'return' => true
+                                        ));
                                 else
-                                        $products[$i][$current_field] = xs_framework::create_textarea(array('text' => $products[$i][$current_field], 'name' => 'products['.$i.']['.$current_field.']', 'return' => true));
+                                        $products[$i][$current_field] = xs_framework::create_textarea( array(
+                                                'text' => $products[$i][$current_field], 
+                                                'name' => 'products['.$i.']['.$current_field.']', 
+                                                'return' => true
+                                        ));
                         }
                         
                 }
@@ -263,6 +316,8 @@ class xs_products_plugin
                 $fields = $this->db->fields_get_name_skip(array('id'));
                 $size_fields = count($fields);
                 
+                $langs = xs_framework::get_option('available_languages');
+                
                 $headers = array('Field', 'Value');
                 $data = array();
                 
@@ -271,9 +326,18 @@ class xs_products_plugin
                         $data[$i][0] = $current_field = $fields[$i];
                         
                         if($current_field == 'lang')
-                                $data[$i][1] = xs_framework::create_select(array('class' => 'xs_full_width', 'name' => 'products[new][lang]', 'data' => xs_language::$language_codes, 'reverse' => true, 'return' => true));
+                                $data[$i][1] = xs_framework::create_select( array(
+                                        'class' => 'xs_full_width', 
+                                        'name' => 'products[new][lang]', 
+                                        'data' => $langs,
+                                        'return' => true
+                                ));
                         else
-                                $data[$i][1] = xs_framework::create_textarea(array('class' => 'xs_full_width', 'name' => 'products[new]['.$current_field.']', 'return' => true));
+                                $data[$i][1] = xs_framework::create_textarea( array(
+                                        'class' => 'xs_full_width', 
+                                        'name' => 'products[new]['.$current_field.']', 
+                                        'return' => true
+                                ));
                 }
                 
                 xs_framework::create_table(array('class' => 'xs_full_width', 'headers' => $headers, 'data' => $data ));
@@ -293,8 +357,21 @@ class xs_products_plugin
                         $fields_name[] = $single;
                 
                 for($i = 0; $i < count($products); $i++) {
-                        $actions = xs_framework::create_link(array('href' => 'admin.php?page=xsoftware_products&edit='.$products[$i]['id'], 'class' => 'button-primary xs_full_width xs_text_center', 'text' => 'Show', 'return' => true));
-                        $actions .= xs_framework::create_button(array( 'name' => 'products[delete]', 'class' => 'button-primary xs_full_width', 'value' => $products[$i]['id'], 'text' => 'Remove', 'onclick'=>'return confirm_box()', 'return' => true));
+                        $actions = xs_framework::create_link( array(
+                                'href' => 'admin.php?page=xsoftware_products&edit='.$products[$i]['id'], 
+                                'class' => 'button-primary xs_full_width xs_text_center', 
+                                'text' => 'Show', 
+                                'return' => true
+                        ));
+                        $actions .= xs_framework::create_button( array( 
+                                'name' => 'products[delete]', 
+                                'class' => 'button-primary xs_full_width', 
+                                'value' => $products[$i]['id'], 
+                                'text' => 'Remove', 
+                                'onclick'=>'return confirm_box()', 
+                                'return' => true
+                        ));
+                        
                         array_unshift($products[$i], $actions);
                 }
                 
