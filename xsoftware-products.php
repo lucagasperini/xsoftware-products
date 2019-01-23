@@ -209,7 +209,7 @@ class xs_products_plugin
                 $fields = $this->db->fields_get_name();
                 $size_fields = count($fields);
                 
-                $langs = xs_framework::get_option('available_languages');
+                $langs = xs_framework::get_available_language();
                 
                 $headers = array('Field', 'Value');
                 $data = array();
@@ -258,7 +258,7 @@ class xs_products_plugin
                 $products = $this->db->products_get();
                 $fields = $this->db->fields_get_name();
                 
-                $langs = xs_framework::get_option('available_languages');
+                $langs = xs_framework::get_available_language();
                 
                 for($i = 0; $i < count($products); $i++)
                 {
@@ -316,7 +316,7 @@ class xs_products_plugin
                 $fields = $this->db->fields_get_name_skip(array('id'));
                 $size_fields = count($fields);
                 
-                $langs = xs_framework::get_option('available_languages');
+                $langs = xs_framework::get_available_language();
                 
                 $headers = array('Field', 'Value');
                 $data = array();
