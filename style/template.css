@@ -39,7 +39,6 @@
         transform: translate(-50%, -50%);
         -ms-transform: translate(-50%, -50%);
         text-align: center;
-        background-color: #ffb342;
         font-size: 20px;
         padding: 16px 32px;
 }
@@ -65,15 +64,6 @@
         height: 300px;
         width: 300px;
         float:right;
-}
-
-.product_title {
-        color:#ffb342;
-}
-
-.product_nome {
-        color:#ffb342;
-        font-size:25px;
 }
 
 .product_descr {

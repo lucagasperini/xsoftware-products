@@ -9,7 +9,7 @@ Text Domain: xsoftware_products
 */
 if(!defined('ABSPATH')) exit;
 
-include "database.php";
+include 'database.php';
 
 class xs_products_plugin
 {
@@ -25,13 +25,27 @@ class xs_products_plugin
 
         public function __construct()
         {
-                
                 add_action('admin_menu', array($this, 'admin_menu'));
                 add_action('admin_init', array($this, 'section_menu'));
                 $this->globals = get_option('xs_products_globals', $this->def_global);
                 $this->db = new xs_products_database();
                 add_shortcode( 'xsoftware_dpc_products', array($this, 'dpc') );
-                
+        }
+        
+        function install_style_pack()
+        {
+                $not_empty = FALSE;
+                $style = xs_framework::get_option('style');
+                if(!isset($style['.product_list_item>a>span'])) {
+                        $style['.product_list_item>a>span'] = array(
+                                'default' => array( 'text' => '' , 'bg' => 'primary', 'bord' => ''), 
+                                'hover' => array( 'text' => '' , 'bg' => '', 'bord' => ''), 
+                                'focus' => array( 'text' => '' , 'bg' => '', 'bord' => ''),
+                        );
+                        $not_empty = TRUE;
+                }
+                if($not_empty === TRUE)
+                        xs_framework::update_option('style', $style);
         }
         
 
@@ -51,6 +65,7 @@ class xs_products_plugin
                 $this->products = $this->db->products_get();
                 
                 xs_framework::init_admin_style();
+                $this->install_style_pack();
                 wp_enqueue_script('xsoftware_products_functions', plugins_url('js/functions.js', __FILE__));
                 
                 echo '<div class="wrap">';

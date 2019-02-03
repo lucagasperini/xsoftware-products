@@ -12,7 +12,7 @@ function products_main($products)
 
 function products_single($product)
 {
-        echo '<header class="entry-header"><h1 class="product_title">'.$product['title'].'</h1></header>';
+        echo '<header class="entry-header"><h1 class="xs_primary">'.$product['title'].'</h1></header>';
         echo '<div class="product_content">';
         echo '<img class="product_img" src="'.$product['img'].'"/>';
         echo '<p class="product_descr">'.$product['descr'].'</p>';
