@@ -38,7 +38,7 @@ class xs_products_plugin
                 $style = xs_framework::get_option('style');
                 if(!isset($style['.product_list_item>a>span'])) {
                         $style['.product_list_item>a>span'] = array(
-                                'default' => array( 'text' => '' , 'bg' => 'primary', 'bord' => ''), 
+                                'default' => array( 'text' => 'text' , 'bg' => 'primary', 'bord' => ''), 
                                 'hover' => array( 'text' => '' , 'bg' => '', 'bord' => ''), 
                                 'focus' => array( 'text' => '' , 'bg' => '', 'bord' => ''),
                         );
