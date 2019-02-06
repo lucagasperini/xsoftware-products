@@ -7,7 +7,8 @@ Author: Luca Gasperini
 Author URI: https://xsoftware.it/
 Text Domain: xsoftware_products
 */
-if(!defined('ABSPATH')) exit;
+
+if(!defined("ABSPATH")) die;
 
 include 'database.php';
 

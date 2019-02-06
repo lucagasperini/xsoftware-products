@@ -1,5 +1,7 @@
 <?php
 
+if(!defined("ABSPATH")) die;
+
 wp_enqueue_style('product_template_style', plugins_url('style/template.css', __FILE__));
 
 function products_main($products)

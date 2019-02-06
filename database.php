@@ -1,5 +1,7 @@
 <?php
 
+if(!defined("ABSPATH")) die;
+
 class xs_products_database
 {
         private $conn = NULL;
