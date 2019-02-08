@@ -67,7 +67,7 @@ class xs_products_plugin
                 
                 xs_framework::init_admin_style();
                 $this->install_style_pack();
-                wp_enqueue_script('xsoftware_products_functions', plugins_url('js/functions.js', __FILE__));
+                xs_framework::init_admin_script();
                 
                 echo '<div class="wrap">';
 
@@ -289,7 +289,7 @@ class xs_products_plugin
                                 'class' => 'button-primary xs_full_width', 
                                 'value' => $products[$i]['id'], 
                                 'text' => 'Remove', 
-                                'onclick'=>'return confirm_box()', 
+                                'onclick'=>'return confirm_box();', 
                                 'return' => true
                         ));
                         array_unshift($products[$i], $actions);
@@ -384,7 +384,7 @@ class xs_products_plugin
                                 'class' => 'button-primary xs_full_width', 
                                 'value' => $products[$i]['id'], 
                                 'text' => 'Remove', 
-                                'onclick'=>'return confirm_box()', 
+                                'onclick'=>'return confirm_box();', 
                                 'return' => true
                         ));
                         
