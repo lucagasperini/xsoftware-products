@@ -10,16 +10,27 @@ Text Domain: xsoftware_products
 
 if(!defined("ABSPATH")) die;
 
-include 'database.php';
-
 class xs_products_plugin
 {
 
-        private $def_global = array ( 
-                                        'template_file' => 'template.php'
+        private $def_global = array (
+                'fields' => [
+                        'image' => [
+                                'name' => 'Image',
+                                'type' => 'img',
+                        ],
+                        'language' => [
+                                'name' => 'Language',
+                                'type' => 'lang',
+                        ],
+                        'descr' => [
+                                'name' => 'Description',
+                                'type' => 'text',
+                        ]
+                ]
         );
         
-        private $globals = array( );
+        private $options = array( );
         
         private $db = NULL;
         
@@ -28,10 +39,148 @@ class xs_products_plugin
         {
                 add_action('admin_menu', array($this, 'admin_menu'));
                 add_action('admin_init', array($this, 'section_menu'));
-                $this->globals = get_option('xs_products_globals', $this->def_global);
-                $this->db = new xs_products_database();
-                add_shortcode( 'xsoftware_dpc_products', array($this, 'dpc') );
+                add_action('init', array($this, 'create_post_type'));
+                add_action('save_post', array($this,'save'), 10, 2 );
+                add_filter('single_template', array($this,'single'));
+                add_filter('archive_template', array($this,'archive'));
+                add_action('add_meta_boxes', array($this, 'metaboxes'));
+                
+                $this->options = get_option('xs_options_products', $this->def_global);
+                $this->db = NULL;
         }
+        
+        function create_post_type() 
+        {
+                register_post_type( 
+                        'xs_product',
+                        array(
+                                'labels' => array(
+                                        'name' => __( 'Products' ),
+                                        'singular_name' => __( 'Product' )
+                                ),
+                                'public' => true,
+                                'has_archive' => true,
+                                'rewrite' => array('slug' => 'product'),
+                                'hierarchical' => true
+                        )
+                );
+                add_post_type_support('xs_product', array('title') );
+        }
+        
+                
+        function metaboxes()
+        {
+                add_meta_box( 'xs_products_metaboxes', 'XSoftware Products', array($this,'metaboxes_print'), ['xs_product'],'advanced','high');
+        }
+        
+        function metaboxes_print()
+        {
+                xs_framework::init_admin_script();
+                xs_framework::init_admin_style();
+                wp_enqueue_media();
+                
+                global $post;
+                $values = get_post_custom( $post->ID );
+                
+                foreach($this->options['fields'] as $key => $single) {
+                        $selected[$key] = $single;
+                        $selected[$key]['value'] = isset( $values['xs_products_'.$key][0] ) ? $values['xs_products_'.$key][0] : '';
+                }
+                
+                $data = array();
+                
+                foreach($selected as $key => $single) {
+                        switch($single['type']) {
+                                case 'img':
+                                        $data[$key][0] = $single['name'].':';
+                                        $data[$key][1] = xs_framework::create_select_media_gallery([
+                                                'src' => $single['value'],
+                                                'width' => 150,
+                                                'height' => 150,
+                                                'alt' => $single['name'],
+                                                'id' => 'xs_products_'.$key,
+                                        ]);
+                                        break;
+                                case 'lang':
+                                        $languages = xs_framework::get_available_language();
+                
+                                        $data[$key][0] = $single['name'].':';
+                                        $data[$key][1] = xs_framework::create_select( array(
+                                                'name' => 'xs_products_'.$key, 
+                                                'selected' => $single['value'], 
+                                                'data' => $languages, 
+                                                'return' => true,
+                                                'default' => 'Select a Language'
+                                        ));
+                                        break;
+                                case 'text':
+                                        $data[$key][0] = $single['name'].':';
+                                        $data[$key][1] = xs_framework::create_textarea( array(
+                                                'class' => 'xs_full_width', 
+                                                'name' => 'xs_products_'.$key,
+                                                'text' => $single['value'],
+                                                'return' => true
+                                        ));
+                                        break;
+                                default:
+                                        $data[$key][0] = $single['name'].':';
+                                        $data[$key][1] = xs_framework::create_input( array(
+                                                'class' => 'xs_full_width', 
+                                                'name' => 'xs_products_'.$key,
+                                                'value' => $single['value'],
+                                                'return' => true
+                                        ));
+                        }
+                        
+                }
+                
+                xs_framework::create_table(array('class' => 'xs_full_width', 'data' => $data ));
+        }
+        
+        function save($post_id, $post)
+        {
+                $post_type = get_post_type($post_id);
+                if ( $post_type != 'xs_product' ) return;
+                
+                foreach($this->options['fields'] as $key => $single) {
+                        if(isset($_POST['xs_products_'.$key]))
+                                update_post_meta( $post_id, 'xs_products_'.$key, $_POST['xs_products_'.$key] );
+                }
+        }
+        
+        function single($single) 
+        {
+                global $post;
+                
+                if(empty($post)) return $single;
+
+                /* Checks for single template by post type */
+                if ( $post->post_type == 'xs_product' ) {
+                        if ( file_exists(  dirname( __FILE__ ) . '/template/single.php' ) ) {
+                                return  dirname( __FILE__ ) . '/template/single.php';
+                        }
+                }
+
+                return $single;
+        }
+        
+        function archive($single)
+        {
+                global $post;
+                
+                if(empty($post)) return $single;
+
+                /* Checks for single template by post type */
+                if ( $post->post_type == 'xs_product' ) {
+                        if ( file_exists(  dirname( __FILE__ ) . '/template/archive.php' ) ) {
+                                return  dirname( __FILE__ ) . '/template/archive.php';
+                        }
+                }
+
+                return $single;
+        }
+        
+        
         
         function install_style_pack()
         {
@@ -62,68 +211,70 @@ class xs_products_plugin
                         wp_die( __( 'Exit!' ) );
                 }
                 
-                $this->fields = $this->db->fields_get();
-                $this->products = $this->db->products_get();
-                
                 xs_framework::init_admin_style();
                 $this->install_style_pack();
                 xs_framework::init_admin_script();
                 
                 echo '<div class="wrap">';
-
-                echo '<h2>Products configuration</h2>';
+               
+                echo "<h2>Product configuration</h2>";
                 
-                // <GLOBAL>
                 echo '<form action="options.php" method="post">';
 
-                settings_fields('setting_globals');
-                do_settings_sections('globals');
+                settings_fields('product_setting');
+                do_settings_sections('product');
 
-                submit_button( '', 'primary', 'field_update', true, NULL );
+                submit_button( '', 'primary', 'submit', true, NULL );
                 echo '</form>';
-                // </GLOBAL>
-                
-                // <FIELDS>
-                echo '<form action="options.php" method="post">';
-
-                settings_fields('setting_field');
-                do_settings_sections('fields');
-
-                submit_button( 'Update fields', 'primary', 'field_update', true, NULL );
-                echo '</form>';
-                // </FIELDS>
-                
-                echo "<form action=\"options.php\" method=\"post\">";
-                
-                // <PRODUCTS>
-                settings_fields('setting_product');
-                do_settings_sections('products');
-                // </PRODUCTS>
-                
-                submit_button( 'Update products', 'primary', 'product_update', true, NULL );
-                
-                echo "</form>";
                 
                 echo '</div>';
+               
         }
 
         function section_menu()
         {
-                register_setting( 'setting_globals', 'xs_products_globals', array($this, 'input_globals') );
-                add_settings_section( 'section_globals', 'Global settings', array($this, 'show_globals'), 'globals' );
-                
-                register_setting( 'setting_field', 'fields', array($this, 'input_fields') );
-                add_settings_section( 'section_field', 'List of fields', array($this, 'show_fields'), 'fields' );
-
-                register_setting( 'setting_product', 'products', array($this, 'input_products') );
-                add_settings_section( 'section_products', 'List of products', array($this, 'show_products'), 'products' );
+                register_setting( 'product_setting', 'xs_options_products', array($this, 'input') );
+                add_settings_section( 'section_setting', 'Settings', array($this, 'show'), 'product' );
         }
 
-
-        function input_globals($input)
+        function show()
         {
-                $input['template_file'] = sanitize_text_field( $input['template_file'] );
-                return $input;
+                $tab = xs_framework::create_tabs( array(
+                        'href' => '?page=xsoftware_products',
+                        'tabs' => array(
+                                'home' => 'Homepage',
+                                'field' => 'Fields'
+                        ),
+                        'home' => 'home',
+                        'name' => 'main_tab'
+                ));
+                
+                switch($tab) {
+                        case 'home':
+                                return;
+                        case 'field':
+                                $this->show_fields();
+                                return;
+                }
+        }
+
+        function input($input)
+        {
+                $current = $this->options;
+                
+                if(isset($input['fields'])) {
+                        $f = $input['fields'];
+                        if(isset($f['new']) && !empty($f['new']['code']) && !empty($f['new']['name']) && !empty($f['new']['type'])) {
+                                $code = $f['new']['code'];
+                                unset($f['new']['code']);
+                                $current['fields'][$code] = $f['new'];
+                        }
+                        if(!empty($f['delete'])) {
+                                unset($current['fields'][$f['delete']]);
+                        }
+                }
+
+                return $current;
         }
         
         function input_fields($input)
@@ -171,21 +322,28 @@ class xs_products_plugin
         
         function show_fields()
         {
-                $fields = $this->db->fields_get_skip(array('id', 'name', 'lang', 'title'));
+                $fields = $this->options['fields'];
                 
-                $headers = array('Actions', 'Name', 'Type');
+                $headers = array('Actions', 'Code', 'Name', 'Type');
                 $data = array();
                 
-                foreach($fields as $current_field) {
-                        $row[0] = xs_framework::create_button(array( 'name' => 'fields[delete]', 'class' => 'button-primary', 'value' => $current_field['Field'], 'text' => 'Remove', 'return' => true));
-                        $row[1] = $current_field['Field'];
-                        $row[2] = $current_field['Type'];
-                        $data[] = $row;
+                foreach($fields as $key => $single) {
+                        $data[$key][0] = xs_framework::create_button(array( 
+                                'name' => 'xs_options_products[fields][delete]', 
+                                'class' => 'button-primary', 
+                                'value' => $key, 
+                                'text' => 'Remove', 
+                                'return' => true
+                        ));
+                        $data[$key][1] = $key;
+                        $data[$key][2] = $single['name'];
+                        $data[$key][3] = $single['type'];
                 }
                 
                 $new[0] = '';
-                $new[1] = xs_framework::create_input(array('name' => 'fields[new][Field]', 'return' => true));
-                $new[2] = xs_framework::create_input(array('name' => 'fields[new][Type]', 'return' => true));
+                $new[1] = xs_framework::create_input(array('name' => 'xs_options_products[fields][new][code]', 'return' => true));
+                $new[2] = xs_framework::create_input(array('name' => 'xs_options_products[fields][new][name]', 'return' => true));
+                $new[3] = xs_framework::create_input(array('name' => 'xs_options_products[fields][new][type]', 'return' => true));
                 
                 $data[] = $new;
                 
