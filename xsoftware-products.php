@@ -15,14 +15,6 @@ class xs_products_plugin
 
         private $def_global = array (
                 'fields' => [
-                        'image' => [
-                                'name' => 'Image',
-                                'type' => 'img',
-                        ],
-                        'language' => [
-                                'name' => 'Language',
-                                'type' => 'lang',
-                        ],
                         'descr' => [
                                 'name' => 'Description',
                                 'type' => 'text',
@@ -64,27 +56,35 @@ class xs_products_plugin
                                 'hierarchical' => true
                         )
                 );
-                add_post_type_support('xs_product', array('title') );
+                add_post_type_support('xs_product', array('title', 'thumbnail') );
         }
         
                 
         function metaboxes()
         {
-                add_meta_box( 'xs_products_metaboxes', 'XSoftware Products', array($this,'metaboxes_print'), ['xs_product'],'advanced','high');
+                $languages = xs_framework::get_available_language();
+                foreach($languages as $code => $name) {
+                        add_meta_box(
+                                'xs_products_metaboxes_'.$code, 
+                                'XSoftware Products '. $name, 
+                                array($this,'metaboxes_print'), 
+                                ['xs_product'],
+                                'advanced',
+                                'high',
+                                $code
+                        );
+                }
         }
         
-        function metaboxes_print()
+        function metaboxes_print($post, $lang_code)
         {
-                xs_framework::init_admin_script();
-                xs_framework::init_admin_style();
-                wp_enqueue_media();
-                
-                global $post;
+                $lang_code = $lang_code['args'];
                 $values = get_post_custom( $post->ID );
                 
                 foreach($this->options['fields'] as $key => $single) {
                         $selected[$key] = $single;
-                        $selected[$key]['value'] = isset( $values['xs_products_'.$key][0] ) ? $values['xs_products_'.$key][0] : '';
+                        $selected[$key]['value'] = isset( $values['xs_products_'.$key.'_'.$lang_code][0] ) ?
+                                $values['xs_products_'.$key.'_'.$lang_code][0] : '';
                 }
                 
                 $data = array();
@@ -98,7 +98,7 @@ class xs_products_plugin
                                                 'width' => 150,
                                                 'height' => 150,
                                                 'alt' => $single['name'],
-                                                'id' => 'xs_products_'.$key,
+                                                'id' => 'xs_products_'.$key.'_'.$lang_code,
                                         ]);
                                         break;
                                 case 'lang':
@@ -106,7 +106,7 @@ class xs_products_plugin
                 
                                         $data[$key][0] = $single['name'].':';
                                         $data[$key][1] = xs_framework::create_select( array(
-                                                'name' => 'xs_products_'.$key, 
+                                                'name' => 'xs_products_'.$key.'_'.$lang_code, 
                                                 'selected' => $single['value'], 
                                                 'data' => $languages, 
                                                 'return' => true,
@@ -117,7 +117,7 @@ class xs_products_plugin
                                         $data[$key][0] = $single['name'].':';
                                         $data[$key][1] = xs_framework::create_textarea( array(
                                                 'class' => 'xs_full_width', 
-                                                'name' => 'xs_products_'.$key,
+                                                'name' => 'xs_products_'.$key.'_'.$lang_code,
                                                 'text' => $single['value'],
                                                 'return' => true
                                         ));
@@ -126,7 +126,7 @@ class xs_products_plugin
                                         $data[$key][0] = $single['name'].':';
                                         $data[$key][1] = xs_framework::create_input( array(
                                                 'class' => 'xs_full_width', 
-                                                'name' => 'xs_products_'.$key,
+                                                'name' => 'xs_products_'.$key.'_'.$lang_code,
                                                 'value' => $single['value'],
                                                 'return' => true
                                         ));
@@ -142,9 +142,13 @@ class xs_products_plugin
                 $post_type = get_post_type($post_id);
                 if ( $post_type != 'xs_product' ) return;
                 
+                $languages = xs_framework::get_available_language();
+                
                 foreach($this->options['fields'] as $key => $single) {
-                        if(isset($_POST['xs_products_'.$key]))
-                                update_post_meta( $post_id, 'xs_products_'.$key, $_POST['xs_products_'.$key] );
+                        foreach($languages as $code => $name) {
+                                if(isset($_POST['xs_products_'.$key.'_'.$code]))
+                                        update_post_meta( $post_id, 'xs_products_'.$key.'_'.$code, $_POST['xs_products_'.$key.'_'.$code] );
+                        }
                 }
         }
         

@@ -1,9 +1,7 @@
 <?php
         if(!defined("ABSPATH")) die;
         
-        wp_enqueue_style('xs_documentation_style', plugins_url('template.css', __FILE__));
-        
-        $users = xs_framework::get_user_display_name();
+        wp_enqueue_style('xs_products_style', plugins_url('template.css', __FILE__));
         
         get_header(); 
         if (get_theme_mod('fullwidth_single')) { //Check if the post needs to be full width
@@ -11,6 +9,8 @@
         } else {
                 $fullwidth = '';
         }
+        
+        $user_lang = xs_framework::get_user_language();
 
         echo '<div id="primary" class="content-area col-md-9 '.$fullwidth.'">';
 
@@ -19,8 +19,8 @@
                 the_post();
                 $id = get_the_ID();
                 $post = get_post($id);
-                $values['image'] = get_post_meta( $id, 'xs_products_image', true );
-                $values['descr'] = get_post_meta( $id, 'xs_products_descr', true );
+                $values['image'] = get_the_post_thumbnail_url( $id, 'medium' );
+                $values['descr'] = get_post_meta( $id, 'xs_products_descr_'.$user_lang, true );
                 $values['title'] = get_the_title($id);
                         
                 echo '<header class="entry-header"><h1 class="xs_primary">'.$values['title'].'</h1></header>';

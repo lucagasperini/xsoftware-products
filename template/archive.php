@@ -22,7 +22,7 @@
                 while ( have_posts() ) { 
                         the_post();
                         $id = get_the_ID();
-                        $values['image'] = get_post_meta( $id, 'xs_products_image', true );
+                        $values['image'] = get_the_post_thumbnail_url( $id, 'medium' );
                         $values['permalink'] = get_permalink($id);
                         $values['title'] = get_the_title($id);
                         
