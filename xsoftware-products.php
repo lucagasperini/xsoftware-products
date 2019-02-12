@@ -18,6 +18,10 @@ class xs_products_plugin
                         'descr' => [
                                 'name' => 'Description',
                                 'type' => 'text',
+                        ],
+                        'text' => [
+                                'name' => 'Text',
+                                'type' => 'text',
                         ]
                 ]
         );
@@ -57,6 +61,7 @@ class xs_products_plugin
                         )
                 );
                 add_post_type_support('xs_product', array('title', 'thumbnail') );
+                remove_post_type_support('xs_product', 'editor');
         }
         
                 
