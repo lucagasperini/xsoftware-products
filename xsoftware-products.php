@@ -132,8 +132,7 @@ class xs_products_plugin
                                         $data[$key][1] = xs_framework::create_input( array(
                                                 'class' => 'xs_full_width', 
                                                 'name' => 'xs_products_'.$key.'_'.$lang_code,
-                                                'value' => $single['value'],
-                                                'return' => true
+                                                'value' => $single['value']
                                         ));
                         }
                         
@@ -307,9 +306,9 @@ class xs_products_plugin
                 }
                 
                 $new[0] = '';
-                $new[1] = xs_framework::create_input(array('name' => 'xs_options_products[fields][new][code]', 'return' => true));
-                $new[2] = xs_framework::create_input(array('name' => 'xs_options_products[fields][new][name]', 'return' => true));
-                $new[3] = xs_framework::create_input(array('name' => 'xs_options_products[fields][new][type]', 'return' => true));
+                $new[1] = xs_framework::create_input(array('name' => 'xs_options_products[fields][new][code]'));
+                $new[2] = xs_framework::create_input(array('name' => 'xs_options_products[fields][new][name]'));
+                $new[3] = xs_framework::create_input(array('name' => 'xs_options_products[fields][new][type]'));
                 
                 $data[] = $new;
                 
