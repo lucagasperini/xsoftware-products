@@ -297,8 +297,7 @@ class xs_products_plugin
                                 'name' => 'xs_options_products[fields][delete]', 
                                 'class' => 'button-primary', 
                                 'value' => $key, 
-                                'text' => 'Remove', 
-                                'return' => true
+                                'text' => 'Remove'
                         ));
                         $data[$key][1] = $key;
                         $data[$key][2] = $single['name'];
