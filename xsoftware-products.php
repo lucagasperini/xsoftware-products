@@ -40,6 +40,7 @@ class xs_products_plugin
                 add_filter('single_template', array($this,'single'));
                 add_filter('archive_template', array($this,'archive'));
                 add_action('add_meta_boxes', array($this, 'metaboxes'));
+                add_filter( 'manage_xs_product_posts_columns', array($this,'add_columns') );
                 
                 $this->options = get_option('xs_options_products', $this->def_global);
                 $this->db = NULL;
@@ -312,6 +313,16 @@ class xs_products_plugin
                 xs_framework::create_table(array('class' => 'xs_full_width', 'headers' => $headers, 'data' => $data));
         }
 
+        function add_columns($columns)
+        {
+                if(isset($columns['language']))
+                        unset($columns['language']);
+                        
+                if(isset($columns['native']))
+                        unset($columns['native']);
+                
+                return $columns;
+        }
 }
 
 $plugin_product = new xs_products_plugin();
