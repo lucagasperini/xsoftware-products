@@ -113,8 +113,7 @@ class xs_products_plugin
                                         $data[$key][1] = xs_framework::create_select( array(
                                                 'name' => 'xs_products_'.$key.'_'.$lang_code, 
                                                 'selected' => $single['value'], 
-                                                'data' => $languages, 
-                                                'return' => true,
+                                                'data' => $languages,
                                                 'default' => 'Select a Language'
                                         ));
                                         break;
