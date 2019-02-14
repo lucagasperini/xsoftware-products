@@ -13,7 +13,7 @@ if(!defined("ABSPATH")) die;
 class xs_products_plugin
 {
 
-        private $def_global = array (
+        private $default = array (
                 'fields' => [
                         'descr' => [
                                 'name' => 'Description',
@@ -40,7 +40,7 @@ class xs_products_plugin
                 add_action('add_meta_boxes', array($this, 'metaboxes'));
                 add_filter( 'manage_xs_product_posts_columns', array($this,'add_columns') );
                 
-                $this->options = get_option('xs_options_products', $this->def_global);
+                $this->options = get_option('xs_options_products', $this->default);
         }
         
         function create_post_type() 
