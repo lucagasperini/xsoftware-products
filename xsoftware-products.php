@@ -28,8 +28,6 @@ class xs_products_plugin
         
         private $options = array( );
         
-        private $db = NULL;
-        
 
         public function __construct()
         {
@@ -43,7 +41,6 @@ class xs_products_plugin
                 add_filter( 'manage_xs_product_posts_columns', array($this,'add_columns') );
                 
                 $this->options = get_option('xs_options_products', $this->def_global);
-                $this->db = NULL;
         }
         
         function create_post_type() 
