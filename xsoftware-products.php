@@ -123,8 +123,7 @@ class xs_products_plugin
                                         $data[$key][1] = xs_framework::create_textarea( array(
                                                 'class' => 'xs_full_width', 
                                                 'name' => 'xs_products_'.$key.'_'.$lang_code,
-                                                'text' => $single['value'],
-                                                'return' => true
+                                                'text' => $single['value']
                                         ));
                                         break;
                                 default:
