@@ -307,7 +307,11 @@ class xs_products_plugin
                 
                 $data[] = $new;
                 
-                xs_framework::create_table(array('class' => 'xs_full_width', 'headers' => $headers, 'data' => $data));
+                xs_framework::create_table(array(
+                        'class' => 'xs_admin_table', 
+                        'headers' => $headers, 
+                        'data' => $data
+                ));
         }
 
         function add_columns($columns)
