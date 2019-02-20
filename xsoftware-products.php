@@ -188,18 +188,13 @@ class xs_products_plugin
         
         function install_style_pack()
         {
-                $not_empty = FALSE;
-                $style = xs_framework::get_option('style');
-                if(!isset($style['.product_list_item>a>span'])) {
-                        $style['.product_list_item>a>span'] = array(
-                                'default' => array( 'text' => 'text' , 'bg' => 'primary', 'bord' => ''), 
-                                'hover' => array( 'text' => '' , 'bg' => '', 'bord' => ''), 
-                                'focus' => array( 'text' => '' , 'bg' => '', 'bord' => ''),
-                        );
-                        $not_empty = TRUE;
-                }
-                if($not_empty === TRUE)
-                        xs_framework::update_option('style', $style);
+                $style['.product_list_item>a>span'] = [
+                        0 => array( 'color' => 'text' , 'background-color' => 'primary', 'border-color' => ''), 
+                        'hover' => array( 'color' => '' , 'background-color' => '', 'border-color' => ''), 
+                        'focus' => array( 'color' => '' , 'background-color' => '', 'border-color' => ''),
+                ];
+               
+                xs_framework::install_style_pack($style);
         }
         
 
