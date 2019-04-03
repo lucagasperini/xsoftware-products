@@ -81,6 +81,7 @@ class xs_products_plugin
         
         function metaboxes_print($post, $lang_code)
         {
+                xs_framework::init_admin_style();
                 $lang_code = $lang_code['args'];
                 $values = get_post_custom( $post->ID );
                 
