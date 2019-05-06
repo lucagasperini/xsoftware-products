@@ -299,7 +299,10 @@ class xs_products_plugin
                 $new[0] = '';
                 $new[1] = xs_framework::create_input(array('name' => 'xs_options_products[fields][new][code]'));
                 $new[2] = xs_framework::create_input(array('name' => 'xs_options_products[fields][new][name]'));
-                $new[3] = xs_framework::create_input(array('name' => 'xs_options_products[fields][new][type]'));
+                $new[3] = xs_framework::create_select(array(
+                        'name' => 'xs_options_products[fields][new][type]',
+                        'data' => array('text' => 'text', 'img' => 'img', 'lang' => 'lang')
+                ));
                 
                 $data[] = $new;
                 
