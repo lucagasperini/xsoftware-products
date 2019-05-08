@@ -26,6 +26,14 @@ class xs_products_plugin
                 ]
         );
         
+        private $types = array(
+                'text' => 'Text', 
+                'ima' => 'Image', 
+                'lang' => 'Language', 
+                'field' => 'Field', 
+                'link' => 'Link'
+        );
+        
         private $options = array( );
         
 
@@ -83,12 +91,12 @@ class xs_products_plugin
         {
                 xs_framework::init_admin_style();
                 $lang_code = $lang_code['args'];
-                $values = get_post_custom( $post->ID );
+                $values = get_post_meta( $post->ID );
                 
                 foreach($this->options['fields'] as $key => $single) {
                         $selected[$key] = $single;
                         $selected[$key]['value'] = isset( $values['xs_products_'.$key.'_'.$lang_code][0] ) ?
-                                $values['xs_products_'.$key.'_'.$lang_code][0] : '';
+                                $values['xs_products_'.$key.'_'.$lang_code][0] : array();
                 }
                 
                 $data = array();
@@ -124,6 +132,36 @@ class xs_products_plugin
                                                 'text' => $single['value']
                                         ));
                                         break;
+                                case 'field':
+                                        $value = unserialize($single['value']);
+                                        
+                                        $data[$key][0] = $single['name'].':';
+                                        $data[$key][1] = xs_framework::create_textarea( array(
+                                                'class' => 'xs_full_width', 
+                                                'name' => 'xs_products_'.$key.'_'.$lang_code.'[a]',
+                                                'text' => $value['a']
+                                        ));
+                                        $data[$key][2] = xs_framework::create_textarea( array(
+                                                'class' => 'xs_full_width', 
+                                                'name' => 'xs_products_'.$key.'_'.$lang_code.'[b]',
+                                                'text' => $value['b']
+                                        ));
+                                        break;
+                                case 'link':
+                                        $value = unserialize($single['value']);
+
+                                        $data[$key][0] = $single['name'].':';
+                                        $data[$key][1] = xs_framework::create_input( array(
+                                                'class' => 'xs_full_width', 
+                                                'name' => 'xs_products_'.$key.'_'.$lang_code.'[url]',
+                                                'value' => $value['url']
+                                        ));
+                                        $data[$key][2] = xs_framework::create_input( array(
+                                                'class' => 'xs_full_width', 
+                                                'name' => 'xs_products_'.$key.'_'.$lang_code.'[text]',
+                                                'value' => $value['text']
+                                        ));
+                                        break;
                                 default:
                                         $data[$key][0] = $single['name'].':';
                                         $data[$key][1] = xs_framework::create_input( array(
@@ -147,8 +185,10 @@ class xs_products_plugin
                 
                 foreach($this->options['fields'] as $key => $single) {
                         foreach($languages as $code => $name) {
-                                if(isset($_POST['xs_products_'.$key.'_'.$code]))
-                                        update_post_meta( $post_id, 'xs_products_'.$key.'_'.$code, $_POST['xs_products_'.$key.'_'.$code] );
+                                $tmp = $_POST['xs_products_'.$key.'_'.$code];
+                                if(isset($tmp)) {
+                                        update_post_meta( $post_id, 'xs_products_'.$key.'_'.$code, $tmp );   
+                                }
                         }
                 }
         }
@@ -293,7 +333,7 @@ class xs_products_plugin
                         ));
                         $data[$key][1] = $key;
                         $data[$key][2] = $single['name'];
-                        $data[$key][3] = $single['type'];
+                        $data[$key][3] = $this->types[$single['type']];
                 }
                 
                 $new[0] = '';
@@ -301,13 +341,13 @@ class xs_products_plugin
                 $new[2] = xs_framework::create_input(array('name' => 'xs_options_products[fields][new][name]'));
                 $new[3] = xs_framework::create_select(array(
                         'name' => 'xs_options_products[fields][new][type]',
-                        'data' => array('text' => 'text', 'img' => 'img', 'lang' => 'lang')
+                        'data' => $this->types
                 ));
                 
                 $data[] = $new;
                 
                 xs_framework::create_table(array(
-                        'class' => 'xs_admin_table', 
+                        'class' => 'xs_admin_table xs_full_width',
                         'headers' => $headers, 
                         'data' => $data
                 ));
