@@ -99,18 +99,22 @@ class xs_products_plugin
         {
                 $values = get_post_meta( $post->ID );
                 
-                $category = isset($values['xs_products_category'][0]) ? intval($values['xs_products_category'][0]) : 'default';
+                $category = isset($values['xs_products_category'][0]) && 
+                        $values['xs_products_category'][0]  !== 'default' ? 
+                        intval($values['xs_products_category'][0]) : 'default';
                 
                 foreach($this->options['category'] as $key => $prop)
                         $cat_list[$key] = $prop['info']['name'];
                 
-                xs_framework::create_select( array(
+                $data[0][0] = 'Select a Category:';
+                $data[0][1] = xs_framework::create_select( array(
                         'name' => 'xs_products_category', 
                         'selected' => $category, 
                         'data' => $cat_list,
-                        'default' => 'Select a Category',
-                        'echo' => TRUE
+                        'default' => 'Select a Category'
                 ));
+                
+                xs_framework::create_table(array('data' => $data ));
         }
         
         function metaboxes_lang_print($post, $lang_code)
@@ -120,7 +124,7 @@ class xs_products_plugin
                 $values = get_post_meta( $post->ID );
                 
                 $category = isset($values['xs_products_category'][0]) ? $values['xs_products_category'][0] : 'default';
-                
+               
                 foreach($this->options['category'][$category]['field'] as $key => $single) {
                         $selected[$key] = $single;
                         $selected[$key]['value'] = isset( $values['xs_products_'.$key.'_'.$lang_code][0] ) ?
