@@ -170,14 +170,54 @@ class xs_products_options
                 
                 if(isset($input['template']['activate']) && isset($input['template']['cat'])){
                         $current_cat = empty($input['template']['cat']) ? 0 : $input['template']['cat'];
-                        $current['category'][$current_cat]['template']['active'] = $input['template']['activate'];
+                        if($this->download_template($input['template']['activate']))
+                                $current['category'][$current_cat]['template']['active'] = $input['template']['activate'];
                 }
                 
                 if(isset($input['template_archive']['activate'])){
-                        $current['template_archive']['active'] = $input['template_archive']['activate'];
+                        if($this->download_template($input['template_archive']['activate']))
+                                $current['template_archive']['active'] = $input['template_archive']['activate'];
                 }
 
                 return $current;
+        }
+        
+        function download_template($id)
+        {
+                $repo = file_get_contents("http://wprepo.xsoftware.it/products/repo.xml");
+                $xml = xs_framework::read_xml($repo);
+                foreach($xml->template as $single) {
+                        if($single->id == $id){
+                                $url = "http://wprepo.xsoftware.it/products/pkg/".$single->id.".tar.gz";
+                                
+                                if(is_dir(XS_CONTENT_DIR) === FALSE)
+                                        mkdir(XS_CONTENT_DIR, 0775);
+                                $products_dir = XS_CONTENT_DIR . 'products/';
+                                if(is_dir($products_dir) === FALSE)
+                                        mkdir($products_dir, 0775);
+                                $template_dir = $products_dir . 'template/';
+                                if(is_dir($template_dir) === FALSE)
+                                        mkdir($template_dir, 0775);
+                                        
+                                     
+                                
+                                if(is_dir($template_dir.basename($url,'.tar.gz')) !== FALSE)
+                                        return TRUE;
+                                        
+                                $savefile = $template_dir.basename($url);
+                                        
+                                file_put_contents($savefile,file_get_contents($url));
+                                $p = new PharData($savefile);
+                                $p->decompress();
+                                unlink($savefile);
+                                $savefile = $template_dir.basename($url,'.gz');
+                                $phar = new PharData($savefile);
+                                $phar->extractTo($template_dir);
+                                unlink($savefile);
+                                return TRUE;
+                        }
+                }
+                return FALSE;
         }
         
         function show_category()
@@ -340,7 +380,9 @@ class xs_products_options
                 }
                 $template_dir  = XS_CONTENT_DIR.'products/template/';
                 
-                $xml = xs_framework::read_xml($template_dir.'/info.xml');
+                $repo = file_get_contents("http://wprepo.xsoftware.it/products/repo.xml");
+                
+                $xml = xs_framework::read_xml($repo);
                 
                 $data = array();
                 
@@ -359,14 +401,13 @@ class xs_products_options
                         $tmp['id'] = $single->id;
                         $tmp['name'] = $single->name;
                         $tmp['descr'] = $single->descr;
-                        $tmp['img'] = $single->img;
                         $tmp['author'] = $single->author;
                         $tmp['version'] = $single->version;
                         $tmp['url'] = $single->url;
                         $data[] = $tmp;
                 }
                 
-                $headers = ['Actions', 'ID', 'Name', 'Description', 'Image', 'Author', 'Version', 'URL'];
+                $headers = ['Actions', 'ID', 'Name', 'Description', 'Author', 'Version', 'URL'];
 
                 xs_framework::create_table(array(
                         'class' => 'xs_admin_table xs_full_width',

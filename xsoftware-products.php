@@ -51,7 +51,7 @@ class xs_products_plugin
 
         }
         
-        function create_post_type() 
+        function create_post_type()
         {
                 register_post_type( 
                         'xs_product',
