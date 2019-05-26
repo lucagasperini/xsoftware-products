@@ -50,7 +50,7 @@ class xs_products_options
         {
                 add_action('admin_menu', array($this, 'admin_menu'));
                 add_action('admin_init', array($this, 'section_menu'));
-
+                
                 $this->options = get_option('xs_options_products', $this->default);
         }
         
@@ -126,7 +126,7 @@ class xs_products_options
                                 $current['category'][$key]['info'] = $input['cat'][$key]['info'];
                 }
                         
-                if(isset($input['add_cat'])){
+                if(isset($input['add_cat']) && !empty($input['id_cat'])){
                         $new_category['info'] = [
                                 'name' => 'New Category', 
                                 'descr' => 'This is a description.', 
@@ -148,7 +148,7 @@ class xs_products_options
                                 'active' => 'default'
                         ];
                         
-                        $current['category'][] = $new_category;
+                        $current['category'][$input['id_cat']] = $new_category;
                 }
                 
                 if(isset($input['remove_cat']) && !empty($input['remove_cat']))
@@ -224,10 +224,15 @@ class xs_products_options
         {
                 $cats = $this->options['category'];
                 
+                
                 xs_framework::create_button([
                                 'class' => 'button-primary xs_margin',
                                 'text' => 'Add new category', 
                                 'name' => 'xs_options_products[add_cat]',
+                                'echo' => TRUE
+                        ]);
+                xs_framework::create_input([
+                                'name' => 'xs_options_products[id_cat]',
                                 'echo' => TRUE
                         ]);
                 
@@ -252,7 +257,11 @@ class xs_products_options
                                 'width' => 150,
                                 'height' => 150,
                         ]);
-                        
+                        $id = xs_framework::create_input([
+                                'name' => 'xs_options_products[cat]['.$key.'][info][id]',
+                                'value' => $key,
+                                'readonly' => TRUE
+                        ]);
                         $name = xs_framework::create_input([
                                 'name' => 'xs_options_products[cat]['.$key.'][info][name]',
                                 'value' => $prop['name']
@@ -269,7 +278,7 @@ class xs_products_options
                         
                         $data[$key]['text'] = xs_framework::create_container([
                                 'class' => 'xs_docs_container',
-                                'obj' => [$name, $descr],
+                                'obj' => [$id, $name, $descr],
                         ]);
                         if($key !== 'default') //SKIP DELETE BUTTON IF IS DEFAULT CATEGORY!
                                 $data[$key]['delete'] = xs_framework::create_button([

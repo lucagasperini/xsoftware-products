@@ -101,7 +101,7 @@ class xs_products_plugin
                 
                 $category = isset($values['xs_products_category'][0]) && 
                         $values['xs_products_category'][0]  !== 'default' ? 
-                        intval($values['xs_products_category'][0]) : 'default';
+                        $values['xs_products_category'][0] : 'default';
                 
                 foreach($this->options['category'] as $key => $prop)
                         $cat_list[$key] = $prop['info']['name'];

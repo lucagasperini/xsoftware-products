@@ -2,11 +2,6 @@
         if(!defined("ABSPATH")) die;
         
         get_header(); 
-        if (get_theme_mod('fullwidth_single')) { //Check if the post needs to be full width
-                $fullwidth = 'fullwidth';
-        } else {
-                $fullwidth = '';
-        }
         
         $options = get_option('xs_options_products');
         
@@ -14,7 +9,7 @@
         
         $single = array();
        
-        echo '<div id="primary" class="content-area col-md-9 '.$fullwidth.'">';
+        echo '<div id="primary" class="content-area">';
 
         echo '<main id="main" class="post-wrap" role="main">';
         while ( have_posts() ) {
@@ -44,9 +39,6 @@
         }
 
         echo '</main></div>';
-
-        if ( get_theme_mod('fullwidth_single', 0) != 1 )
-                get_sidebar();
                 
         get_footer(); 
 ?>
