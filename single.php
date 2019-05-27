@@ -8,8 +8,10 @@
         $user_lang = xs_framework::get_user_language();
         
         $single = array();
+        
+        $layout = get_theme_mod('page_layout');
        
-        echo '<div id="primary" class="content-area">';
+        echo '<div id="primary" class="content-area '.$layout.'">';
 
         echo '<main id="main" class="post-wrap" role="main">';
         while ( have_posts() ) {
@@ -39,6 +41,9 @@
         }
 
         echo '</main></div>';
+        
+        if ( $layout !== 'fullscreen' )
+                get_sidebar();
                 
         get_footer(); 
 ?>
