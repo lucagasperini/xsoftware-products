@@ -22,7 +22,7 @@ class xs_products_plugin
 
         public function __construct()
         {;
-                add_action('init', array($this, 'create_post_type'));
+                add_action('init', array($this, 'setup'));
                 add_action('save_post', array($this,'save'), 10, 2 );
                 add_filter('single_template', array($this,'single'));
                 add_filter('archive_template', array($this,'archive'));
@@ -30,6 +30,18 @@ class xs_products_plugin
                 add_filter( 'manage_xs_product_posts_columns', array($this,'add_columns') );
 
                 $this->options = get_option('xs_options_products');
+
+        }
+
+        function setup()
+        {
+                xs_framework::register_plugin(
+                        'xs_products',
+                        'xs_options_products'
+                );
+
+                $this->install_template();
+                $this->create_post_type();
         }
 
         function install_template()
