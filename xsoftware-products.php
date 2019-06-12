@@ -145,6 +145,7 @@ class xs_products_plugin
 
                 $data = array();
 
+                /* TODO: Use xs_framework::html_input_array_to_table to print those fields? */
                 foreach($selected as $key => $single) {
                         switch($single['type']) {
                                 case 'img':
