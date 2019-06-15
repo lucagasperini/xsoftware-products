@@ -15,9 +15,6 @@ class xs_products_options
                                         'descr' => 'This is the default category for products.',
                                         'img' => ''
                                 ],
-                                'template' => [
-                                        'active' => 'default',
-                                ],
                                 'field' => [
                                         'descr' => [
                                                 'name' => 'Description',
@@ -29,9 +26,6 @@ class xs_products_options
                                         ]
                                 ]
                         ]
-                ],
-                'template_archive' => [
-                        'active' => 'default'
                 ]
         );
 
@@ -67,8 +61,8 @@ class xs_products_options
                         wp_die( __( 'Exit!' ) );
                 }
 
-                xs_framework::init_admin_style();
-                xs_framework::init_admin_script();
+
+
 
                 echo '<div class="wrap">';
 
@@ -98,8 +92,7 @@ class xs_products_options
                         'href' => '?page=xsoftware_products',
                         'tabs' => array(
                                 'category' => 'Category',
-                                'field' => 'Fields',
-                                'template' => 'Templates'
+                                'field' => 'Fields'
                         ),
                         'home' => 'category',
                         'name' => 'main_tab'
@@ -111,9 +104,6 @@ class xs_products_options
                                 return;
                         case 'field':
                                 $this->show_fields();
-                                return;
-                        case 'template':
-                                $this->show_template();
                                 return;
                 }
         }
@@ -144,10 +134,6 @@ class xs_products_options
                                 ]
                         ];
 
-                        $new_category['template'] = [
-                                'active' => 'default'
-                        ];
-
                         $current['category'][$input['id_cat']] = $new_category;
                 }
 
@@ -168,16 +154,6 @@ class xs_products_options
                         }
                 }
 
-                if(isset($input['template']['activate']) && isset($input['template']['cat'])){
-                        $current_cat = empty($input['template']['cat']) ? 0 : $input['template']['cat'];
-                        if($this->download_template($input['template']['activate']))
-                                $current['category'][$current_cat]['template']['active'] = $input['template']['activate'];
-                }
-
-                if(isset($input['template_archive']['activate'])){
-                        if($this->download_template($input['template_archive']['activate']))
-                                $current['template_archive']['active'] = $input['template_archive']['activate'];
-                }
 
                 return $current;
         }
@@ -257,6 +233,11 @@ class xs_products_options
                                 'width' => 150,
                                 'height' => 150,
                         ]);
+                        $archive = xs_framework::create_select([
+                                'data' => xs_framework::get_wp_pages_link(),
+                                'selected' => $prop['archive'],
+                                'name' => 'xs_options_products[cat]['.$key.'][info][archive]'
+                        ]);
                         $id = xs_framework::create_input([
                                 'name' => 'xs_options_products[cat]['.$key.'][info][id]',
                                 'value' => $key,
@@ -278,7 +259,7 @@ class xs_products_options
 
                         $data[$key]['text'] = xs_framework::create_container([
                                 'class' => 'xs_docs_container',
-                                'obj' => [$id, $name, $descr],
+                                'obj' => [$archive, $id, $name, $descr],
                         ]);
                         if($key !== 'default') //SKIP DELETE BUTTON IF IS DEFAULT CATEGORY!
                                 $data[$key]['delete'] = xs_framework::create_button([
@@ -355,76 +336,6 @@ class xs_products_options
                         'data' => $data
                 ));
         }
-
-        function show_template()
-        {
-                $cats = $this->options['category'];
-
-                $tabs = ['archive' => 'Archive'];
-
-                foreach($cats as $key => $prop){
-                        $tabs[$key] = $prop['info']['name'];
-                }
-
-                $tab = xs_framework::create_tabs( array(
-                        'href' => '?page=xsoftware_products&main_tab=template',
-                        'tabs' => $tabs,
-                        'home' => 'default',
-                        'name' => 'field_tab'
-                ));
-
-                xs_framework::create_input([
-                        'name' => 'xs_options_products[template][cat]',
-                        'style' => 'display:none;',
-                        'value' => $tab,
-                        'echo' => TRUE
-                ]);
-
-                if($tab === 'archive') {
-                        $template = $this->options['template_archive'];
-                        $input_name = 'xs_options_products[template_archive][activate]';
-                } else {
-                        $template = $this->options['category'][$tab]['template'];
-                        $input_name = 'xs_options_products[template][activate]';
-                }
-                $template_dir  = XS_CONTENT_DIR.'products/template/';
-
-                $repo = file_get_contents("http://wprepo.xsoftware.it/products/repo.xml");
-
-                $xml = xs_framework::read_xml($repo);
-
-                $data = array();
-
-                foreach($xml->template as $single) {
-                        if($template['active'] != $single->id) {
-                                $tmp[0] = xs_framework::create_button(array(
-                                        'name' => $input_name,
-                                        'class' => 'button-primary',
-                                        'value' => $single->id,
-                                        'text' => 'Activate'
-                                ));
-                        } else {
-                                $tmp[0] = 'Active';
-                        }
-
-                        $tmp['id'] = $single->id;
-                        $tmp['name'] = $single->name;
-                        $tmp['descr'] = $single->descr;
-                        $tmp['author'] = $single->author;
-                        $tmp['version'] = $single->version;
-                        $tmp['url'] = $single->url;
-                        $data[] = $tmp;
-                }
-
-                $headers = ['Actions', 'ID', 'Name', 'Description', 'Author', 'Version', 'URL'];
-
-                xs_framework::create_table(array(
-                        'class' => 'xs_admin_table xs_full_width',
-                        'headers' => $headers,
-                        'data' => $data
-                ));
-        }
-
 }
 
 endif;

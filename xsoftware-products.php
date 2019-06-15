@@ -28,9 +28,76 @@ class xs_products_plugin
                 add_filter('archive_template', array($this,'archive'));
                 add_action('add_meta_boxes', array($this, 'metaboxes'));
                 add_filter( 'manage_xs_product_posts_columns', array($this,'add_columns') );
+                add_shortcode('xs_product_archive', [$this,'shortcode_archive']);
+                add_filter('xs_product_archive_html', [ $this, 'archive_html' ], 0, 2);
+                add_filter('xs_product_single_html', [ $this, 'single_html' ], 0, 2);
 
                 $this->options = get_option('xs_options_products');
 
+        }
+
+        function single_html($id, $single)
+        {
+                wp_enqueue_style(
+                        'xs_product_template',
+                        plugins_url('style/template.css', __FILE__)
+                );
+                $image = get_the_post_thumbnail_url( $id, 'medium' );
+                $title = get_the_title($id);
+                echo '<div class="product_item">';
+                echo '<div class="product_content">';
+                echo '<h1 class="product_title xs_primary">'.$title.'</h1>';
+                echo '<p class="product_descr">'.$single['descr'].'</p>';
+                echo '<p>'.$single['text'].'</p>';
+                echo '</div>';
+                echo '<img class="product_img" src="'.$image.'"/>';
+                echo '</div>';
+                do_shortcode('[xs_cart_add]');
+        }
+
+        function archive_html($archive, $user_lang)
+        {
+                wp_enqueue_style(
+                        'xs_product_template',
+                        plugins_url('style/template.css', __FILE__)
+                );
+                foreach($archive as $single) {
+                        $image = get_the_post_thumbnail_url( $single, 'medium' );
+                        $title = get_the_title($single);
+                        $link = get_the_permalink($single);
+                        $descr = get_post_meta(
+                                $single->ID,
+                                'xs_products_descr_'.$user_lang,
+                                true
+                        );
+
+                        echo '<a href="'.$link.'">';
+                        echo '<div class="product_list_item">';
+                        echo '<div class="product_list_item_text">';
+                        echo '<h2>'.$title.'</h2>';
+                        echo '<span>'.$descr.'</span>';
+                        echo '</div>';
+                        echo '<img src="'.$image.'" /></div></a>';
+                }
+        }
+
+        function shortcode_archive($attr)
+        {
+                $a = shortcode_atts(
+                        [
+                                'cat' => ''
+                        ],
+                        $attr
+                );
+
+                $user_lang = xs_framework::get_user_language();
+                $archive = get_posts([
+                        'post_type' => 'xs_product',
+                        'meta_key' => 'xs_products_category',
+                        'meta_value' => $a['cat']
+                ]);
+
+                apply_filters('xs_product_archive_html', $archive, $user_lang);
         }
 
         function setup()
@@ -131,7 +198,7 @@ class xs_products_plugin
 
         function metaboxes_lang_print($post, $lang_code)
         {
-                xs_framework::init_admin_style();
+
                 $lang_code = $lang_code['args'];
                 $values = get_post_meta( $post->ID );
 
@@ -280,9 +347,8 @@ class xs_products_plugin
 
                 /* Checks for single template by post type */
                 if ( $post->post_type == 'xs_product' ) {
-                        if ( file_exists(  dirname( __FILE__ ) . '/archive.php' ) ) {
-                                return  dirname( __FILE__ ) . '/archive.php';
-                        }
+                        wp_redirect($this->options['category']['default']['info']['archive']);
+                        exit;
                 }
 
                 return $single;
