@@ -1,7 +1,7 @@
 <?php
-if(!defined("ABSPATH")) die;
+if(!defined('ABSPATH')) die;
 
-if (!class_exists("xs_products_options")) :
+if (!class_exists('xs_products_options')) :
 /**
  * This class control plugin settings.
  */
@@ -66,7 +66,7 @@ class xs_products_options
 
                 echo '<div class="wrap">';
 
-                echo "<h2>Product configuration</h2>";
+                echo '<h2>Product configuration</h2>';
 
                 echo '<form action="options.php" method="post">';
 
