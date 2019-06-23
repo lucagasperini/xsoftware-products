@@ -40,7 +40,7 @@ class xs_products_plugin
         {
                 wp_enqueue_style(
                         'xs_product_template',
-                        plugins_url('style/template.css', __FILE__)
+                        plugins_url('style/template.min.css', __FILE__)
                 );
                 $image = get_the_post_thumbnail_url( $id, 'medium' );
                 $title = get_the_title($id);
@@ -60,7 +60,7 @@ class xs_products_plugin
                 $output = '';
                 wp_enqueue_style(
                         'xs_product_template',
-                        plugins_url('style/template.css', __FILE__)
+                        plugins_url('style/template.min.css', __FILE__)
                 );
                 foreach($archive as $single) {
                         $image = get_the_post_thumbnail_url( $single, 'medium' );
