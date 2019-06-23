@@ -57,6 +57,7 @@ class xs_products_plugin
 
         function archive_html($archive, $user_lang)
         {
+                $output = '';
                 wp_enqueue_style(
                         'xs_product_template',
                         plugins_url('style/template.css', __FILE__)
@@ -71,14 +72,16 @@ class xs_products_plugin
                                 true
                         );
 
-                        echo '<a href="'.$link.'">';
-                        echo '<div class="product_list_item">';
-                        echo '<div class="product_list_item_text">';
-                        echo '<h2>'.$title.'</h2>';
-                        echo '<span>'.$descr.'</span>';
-                        echo '</div>';
-                        echo '<img src="'.$image.'" /></div></a>';
+                        $output .= '<a href="'.$link.'">';
+                        $output .= '<div class="product_list_item">';
+                        $output .= '<div class="product_list_item_text">';
+                        $output .= '<h2>'.$title.'</h2>';
+                        $output .= '<span>'.$descr.'</span>';
+                        $output .= '</div>';
+                        $output .= '<img src="'.$image.'" /></div></a>';
                 }
+
+                return $output;
         }
 
         function shortcode_archive($attr)
@@ -97,7 +100,7 @@ class xs_products_plugin
                         'meta_value' => $a['cat']
                 ]);
 
-                apply_filters('xs_product_archive_html', $archive, $user_lang);
+                return apply_filters('xs_product_archive_html', $archive, $user_lang);
         }
 
         function setup()
