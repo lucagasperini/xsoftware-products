@@ -94,7 +94,9 @@ class xs_products_plugin
                 );
 
                 $user_lang = xs_framework::get_user_language();
+                /* FIXME: Add option where set numberposts */
                 $archive = get_posts([
+                        'numberposts' => 20,
                         'post_type' => 'xs_product',
                         'meta_key' => 'xs_products_category',
                         'meta_value' => $a['cat']
