@@ -46,13 +46,12 @@ class xs_products_plugin
                 $title = get_the_title($id);
                 echo '<div class="product_item">';
                 echo '<div class="product_content">';
-                echo '<h1 class="product_title xs_primary">'.$title.'</h1>';
+                echo '<h1 class="product_title">'.$title.'</h1>';
                 echo '<p class="product_descr">'.$single['descr'].'</p>';
                 echo '<p>'.$single['text'].'</p>';
                 echo '</div>';
                 echo '<img class="product_img" src="'.$image.'"/>';
                 echo '</div>';
-                do_shortcode('[xs_cart_add]');
         }
 
         function archive_html($archive, $user_lang)
