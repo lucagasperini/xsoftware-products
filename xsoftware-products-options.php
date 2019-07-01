@@ -222,7 +222,7 @@ class xs_products_options
                                 'value' => $prop['img']
                         ]);
                         if(empty($prop['img']))
-                                $url_img = xs_framework::url_image('select.png');
+                                $url_img = xs_framework::url_image('select.min.svg');
                         else
                                 $url_img = $prop['img'];
 
