@@ -29,58 +29,9 @@ class xs_products_plugin
                 add_action('add_meta_boxes', array($this, 'metaboxes'));
                 add_filter( 'manage_xs_product_posts_columns', array($this,'add_columns') );
                 add_shortcode('xs_product_archive', [$this,'shortcode_archive']);
-                add_filter('xs_product_archive_html', [ $this, 'archive_html' ], 0, 2);
-                add_filter('xs_product_single_html', [ $this, 'single_html' ], 0, 2);
 
                 $this->options = get_option('xs_options_products');
 
-        }
-
-        function single_html($id, $single)
-        {
-                wp_enqueue_style(
-                        'xs_product_template',
-                        plugins_url('style/template.min.css', __FILE__)
-                );
-                $image = get_the_post_thumbnail_url( $id, 'medium' );
-                $title = get_the_title($id);
-                echo '<div class="product_item">';
-                echo '<div class="product_content">';
-                echo '<h1 class="product_title">'.$title.'</h1>';
-                echo '<p class="product_descr">'.$single['descr'].'</p>';
-                echo '<p>'.$single['text'].'</p>';
-                echo '</div>';
-                echo '<img class="product_img" src="'.$image.'"/>';
-                echo '</div>';
-        }
-
-        function archive_html($archive, $user_lang)
-        {
-                $output = '';
-                wp_enqueue_style(
-                        'xs_product_template',
-                        plugins_url('style/template.min.css', __FILE__)
-                );
-                foreach($archive as $single) {
-                        $image = get_the_post_thumbnail_url( $single, 'medium' );
-                        $title = get_the_title($single);
-                        $link = get_the_permalink($single);
-                        $descr = get_post_meta(
-                                $single->ID,
-                                'xs_products_descr_'.$user_lang,
-                                true
-                        );
-
-                        $output .= '<a href="'.$link.'">';
-                        $output .= '<div class="product_list_item">';
-                        $output .= '<div class="product_list_item_text">';
-                        $output .= '<h2>'.$title.'</h2>';
-                        $output .= '<span>'.$descr.'</span>';
-                        $output .= '</div>';
-                        $output .= '<img src="'.$image.'" /></div></a>';
-                }
-
-                return $output;
         }
 
         function shortcode_archive($attr)
