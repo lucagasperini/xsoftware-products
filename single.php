@@ -23,10 +23,22 @@
                         $category = 'default';
 
                 foreach($options['category'][$category]['field'] as $key => $values) {
-                        $single[$key] = get_post_meta( $id, 'xs_products_'.$key.'_'.$user_lang, true );
+                        if(!in_array($values['type'],['img', 'bool', 'int', 'url'])) {
+                                $single[$key] = get_post_meta(
+                                        $id,
+                                        'xs_products_'.$key.'_'.$user_lang,
+                                        true
+                                );
+                        } else {
+                                $single[$key] = get_post_meta(
+                                        $id,
+                                        'xs_products_const_'.$key,
+                                        true
+                                );
+                        }
                 }
 
-                apply_filters('xs_product_single_html', $id, $single);
+                echo apply_filters('xs_product_single_html', $id, $single);
                 // If comments are open or we have at least one comment, load up the comment template
                 if ( comments_open() || get_comments_number() )
                         comments_template();

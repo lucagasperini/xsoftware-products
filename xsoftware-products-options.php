@@ -29,15 +29,6 @@ class xs_products_options
                 ]
         );
 
-
-        private $types = array(
-                'text' => 'Text',
-                'ima' => 'Image',
-                'lang' => 'Language',
-                'field' => 'Field',
-                'link' => 'Link'
-        );
-
         private $options = array( );
 
         public function __construct()
@@ -140,7 +131,6 @@ class xs_products_options
                 if(isset($input['remove_cat']) && !empty($input['remove_cat']))
                         unset($current['category'][$input['remove_cat']]);
 
-
                 if(isset($input['field'])) {
                         $current_cat = empty($input['field']['cat']) ? 0 : $input['field']['cat'];
                         $f = $input['field'];
@@ -158,43 +148,7 @@ class xs_products_options
                 return $current;
         }
 
-        function download_template($id)
-        {
-                $repo = file_get_contents("http://wprepo.xsoftware.it/products/repo.xml");
-                $xml = xs_framework::read_xml($repo);
-                foreach($xml->template as $single) {
-                        if($single->id == $id){
-                                $url = "http://wprepo.xsoftware.it/products/pkg/".$single->id.".tar.gz";
 
-                                if(is_dir(XS_CONTENT_DIR) === FALSE)
-                                        mkdir(XS_CONTENT_DIR, 0775);
-                                $products_dir = XS_CONTENT_DIR . 'products/';
-                                if(is_dir($products_dir) === FALSE)
-                                        mkdir($products_dir, 0775);
-                                $template_dir = $products_dir . 'template/';
-                                if(is_dir($template_dir) === FALSE)
-                                        mkdir($template_dir, 0775);
-
-
-
-                                if(is_dir($template_dir.basename($url,'.tar.gz')) !== FALSE)
-                                        return TRUE;
-
-                                $savefile = $template_dir.basename($url);
-
-                                file_put_contents($savefile,file_get_contents($url));
-                                $p = new PharData($savefile);
-                                $p->decompress();
-                                unlink($savefile);
-                                $savefile = $template_dir.basename($url,'.gz');
-                                $phar = new PharData($savefile);
-                                $phar->extractTo($template_dir);
-                                unlink($savefile);
-                                return TRUE;
-                        }
-                }
-                return FALSE;
-        }
 
         function show_category()
         {
@@ -307,6 +261,7 @@ class xs_products_options
 
                 $headers = array('Actions', 'Code', 'Name', 'Type');
                 $data = array();
+                $types = xs_framework::html_input_array_types();
 
                 foreach($fields as $key => $single) {
                         $data[$key][0] = xs_framework::create_button(array(
@@ -317,7 +272,7 @@ class xs_products_options
                         ));
                         $data[$key][1] = $key;
                         $data[$key][2] = $single['name'];
-                        $data[$key][3] = $this->types[$single['type']];
+                        $data[$key][3] = $types[$single['type']];
                 }
 
                 $new[0] = '';
@@ -325,7 +280,7 @@ class xs_products_options
                 $new[2] = xs_framework::create_input(array('name' => 'xs_options_products[field][new][name]'));
                 $new[3] = xs_framework::create_select(array(
                         'name' => 'xs_options_products[field][new][type]',
-                        'data' => $this->types
+                        'data' => $types
                 ));
 
                 $data[] = $new;
