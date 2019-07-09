@@ -32,28 +32,45 @@ class xs_products_plugin
                 add_shortcode('xs_product_archive', [$this,'shortcode_archive']);
 
                 $this->options = get_option('xs_options_products');
-
         }
 
         function shortcode_archive($attr)
         {
                 $a = shortcode_atts(
                         [
-                                'cat' => ''
+                                'cat' => '',
+                                'orderby' => 'date',
+                                'order' => 'DESC',
+                                'numberposts' => 20
                         ],
                         $attr
                 );
 
+                if(empty($a['cat']))
+                        $category = 'default';
+                else
+                        $category = $a['cat'];
+
                 $user_lang = xs_framework::get_user_language();
                 /* FIXME: Add option where set numberposts */
                 $archive = get_posts([
-                        'numberposts' => 20,
+                        'numberposts' => $a['numberposts'],
                         'post_type' => 'xs_product',
                         'meta_key' => 'xs_products_category',
-                        'meta_value' => $a['cat']
+                        'meta_value' => $a['cat'],
+                        'orderby' => $a['orderby'],
+                        'order' => $a['order'],
+                        'fields' => 'ids',
                 ]);
 
-                return apply_filters('xs_product_archive_html', $archive, $user_lang);
+                if($category === 'default')
+                        return apply_filters('xs_product_archive_html', $archive, $user_lang);
+                else
+                        return apply_filters(
+                                'xs_product_archive_html_'.$category,
+                                $archive,
+                                $user_lang
+                        );
         }
 
         function setup()
