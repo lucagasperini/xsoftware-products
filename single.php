@@ -11,9 +11,11 @@
 
         $layout = get_theme_mod('page_layout');
 
-        echo '<div id="primary" class="content-area '.$layout.'">';
+        /* Print primary and main elements */
+        echo '<div class="wrap">
+        <div id="primary" class="content-area '.$layout.'">
+        <main id="main" class="post-wrap" role="main">';
 
-        echo '<main id="main" class="post-wrap" role="main">';
         while ( have_posts() ) {
                 the_post();
 
@@ -48,7 +50,7 @@
                         comments_template();
         }
 
-        echo '</main></div>';
+        echo '</main></div></div>';
 
         if ( $layout !== 'fullscreen' )
                 get_sidebar();
