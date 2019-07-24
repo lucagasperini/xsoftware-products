@@ -44,10 +44,6 @@
                         echo apply_filters('xs_product_single_html', $id, $single);
                 else
                         echo apply_filters('xs_product_single_html_'.$category, $id, $single);
-
-                // If comments are open or we have at least one comment, load up the comment template
-                if ( comments_open() || get_comments_number() )
-                        comments_template();
         }
 
         echo '</main></div></div>';
