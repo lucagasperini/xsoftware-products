@@ -39,7 +39,7 @@ class xs_products_plugin
                 $a = shortcode_atts(
                         [
                                 'cat' => '',
-                                'orderby' => 'date',
+                                'orderby' => 'order_clause',
                                 'order' => 'DESC',
                                 'numberposts' => 20
                         ],
@@ -61,6 +61,12 @@ class xs_products_plugin
                         'orderby' => $a['orderby'],
                         'order' => $a['order'],
                         'fields' => 'ids',
+                        'meta_query' => [
+                                'order_clause' => [
+                                        'key' => 'xs_products_order',
+                                        'type' => 'NUMERIC'
+                                ]
+                        ]
                 ]);
 
                 if($category === 'default')
@@ -130,18 +136,33 @@ class xs_products_plugin
                         $post_meta['xs_products_category'][0]  !== 'default' ?
                         $post_meta['xs_products_category'][0] : 'default';
 
+                $order = isset($post_meta['xs_products_order'][0]) ?
+                        intval($post_meta['xs_products_order'][0]) : 0;
+
                 foreach($this->options['category'] as $key => $prop)
                         $cat_list[$key] = $prop['info']['name'];
 
                 $data[0][0] = 'Select a Category:';
-                $data[0][1] = xs_framework::create_select( array(
+                $data[0][1] = xs_framework::create_select([
                         'name' => 'xs_products_category',
                         'selected' => $category,
                         'data' => $cat_list,
+                        'class' => 'xs_full_width',
                         'default' => 'Select a Category'
-                ));
+                ]);
 
-                xs_framework::create_table(array('data' => $data ));
+                $data[1][0] = 'Select a Order Number:';
+                $data[1][1] = xs_framework::create_input_number([
+                        'name' => 'xs_products_order',
+                        'class' => 'xs_full_width',
+                        'max' => 9999999999,
+                        'value' => $order
+                ]);
+
+                xs_framework::create_table([
+                        'data' => $data,
+                        'class' => 'xs_full_width'
+                ]);
 
                 $data = array();
 
@@ -222,6 +243,9 @@ class xs_products_plugin
                                 $values['xs_products_category'][0] :
                                 'default';
                 }
+
+                if(isset($_POST['xs_products_order']))
+                        update_post_meta( $post_id, 'xs_products_order', intval($_POST['xs_products_order']) );
 
                 $languages = xs_framework::get_available_language();
 
