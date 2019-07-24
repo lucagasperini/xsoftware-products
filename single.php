@@ -25,7 +25,7 @@
                         $category = 'default';
 
                 foreach($options['category'][$category]['field'] as $key => $values) {
-                        if(!in_array($values['type'],['img', 'bool', 'int', 'url'])) {
+                        if(!isset($values['const']) || $values['const'] == FALSE) {
                                 $single[$key] = get_post_meta(
                                         $id,
                                         'xs_products_'.$key.'_'.$user_lang,

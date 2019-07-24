@@ -7,7 +7,7 @@ if (!class_exists('xs_products_options')) :
  */
 class xs_products_options
 {
-        private $default = array (
+        private $default = [
                 'category' => [
                         'default' => [
                                 'info' => [
@@ -19,15 +19,12 @@ class xs_products_options
                                         'descr' => [
                                                 'name' => 'Description',
                                                 'type' => 'text',
-                                        ],
-                                        'text' => [
-                                                'name' => 'Text',
-                                                'type' => 'text',
+                                                'const' => FALSE
                                         ]
                                 ]
                         ]
                 ]
-        );
+        ];
 
         private $options = array( );
 
@@ -118,10 +115,7 @@ class xs_products_options
                                 'descr' => [
                                         'name' => 'Description',
                                         'type' => 'text',
-                                ],
-                                'text' => [
-                                        'name' => 'Text',
-                                        'type' => 'text',
+                                        'const' => FALSE
                                 ]
                         ];
 
@@ -273,15 +267,24 @@ class xs_products_options
                         $data[$key][1] = $key;
                         $data[$key][2] = $single['name'];
                         $data[$key][3] = $types[$single['type']];
+                        $data[$key][4] = isset($single['const']) && $single['const'] != FALSE ? 'True' : 'False';
                 }
 
                 $new[0] = '';
-                $new[1] = xs_framework::create_input(array('name' => 'xs_options_products[field][new][code]'));
-                $new[2] = xs_framework::create_input(array('name' => 'xs_options_products[field][new][name]'));
-                $new[3] = xs_framework::create_select(array(
+                $new[1] = xs_framework::create_input([
+                        'name' => 'xs_options_products[field][new][code]'
+                ]);
+                $new[2] = xs_framework::create_input([
+                        'name' => 'xs_options_products[field][new][name]'
+                ]);
+                $new[3] = xs_framework::create_select([
                         'name' => 'xs_options_products[field][new][type]',
                         'data' => $types
-                ));
+                ]);
+                $new[4] = xs_framework::create_input_checkbox([
+                        'name' => 'xs_options_products[field][new][const]',
+                        'value' => 1
+                ]);
 
                 $data[] = $new;
 

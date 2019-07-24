@@ -167,7 +167,7 @@ class xs_products_plugin
                 $data = array();
 
                 foreach($this->options['category'][$category]['field'] as $key => $single) {
-                        if(in_array($single['type'],$this->constant_types)) {
+                        if(isset($single['const']) && $single['const'] != FALSE) {
                                 $tmp['name'] = 'xs_products_const_'.$key;
                                 $tmp['label'] = $single['name'].':';
                                 $tmp['class'] = 'xs_full_width';
@@ -202,7 +202,7 @@ class xs_products_plugin
                 $data = array();
 
                 foreach($this->options['category'][$category]['field'] as $key => $single) {
-                        if(!in_array($single['type'],$this->constant_types)) {
+                        if(!isset($single['const']) || $single['const'] == FALSE) {
                                 $tmp['name'] = 'xs_products_'.$key.'_'.$lang_code;
                                 $tmp['label'] = $single['name'];
                                 $tmp['class'] = 'xs_full_width';
@@ -250,7 +250,7 @@ class xs_products_plugin
                 $languages = xs_framework::get_available_language();
 
                 foreach($this->options['category'][$current_category]['field'] as $key => $single) {
-                        if(!in_array($single['type'],$this->constant_types)) {
+                        if(!isset($single['const']) || $single['const'] == FALSE) {
                                 foreach($languages as $code => $name) {
                                         if(isset($_POST['xs_products_'.$key.'_'.$code])) {
                                                 update_post_meta(
