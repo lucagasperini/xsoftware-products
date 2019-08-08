@@ -296,8 +296,8 @@ class xs_products_options
         }
 }
 
-endif;
-
 $xs_products_options = new xs_products_options();
+
+endif;
 
 ?>

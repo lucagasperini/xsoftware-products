@@ -315,8 +315,8 @@ class xs_products_plugin
         }
 }
 
-endif;
-
 $xs_products_plugin = new xs_products_plugin();
+
+endif;
 
 ?>
